@@ -204,7 +204,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request){
 	key, ok := mapGrow.Load("BRZNGDP_R2002")
 	if !ok {
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"msg":"not finished"}`))
 		return
 	}
