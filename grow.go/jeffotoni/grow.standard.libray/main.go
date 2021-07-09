@@ -210,13 +210,15 @@ func Post(w http.ResponseWriter, r *http.Request){
 		for _, v := range grow {
 			year := strconv.Itoa(v.Year)
 			key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
-			mapGrow.LoadOrStore(key, v.Value)
+			_, ok := mapGrow.LoadOrStore(key, v.Value)
+			if !ok {
+			}
 		}
 		mapGrowCount.Store("count", len(grow))
 		log.Println("map done:", len(grow))
 	}(grow)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusAccepted)
 	w.Write([]byte(`{"msg":"In progress"}`))
 }
