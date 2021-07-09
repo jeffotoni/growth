@@ -40,6 +40,10 @@ type dataGrowth struct {
 	Year      int     `json:"Year"`
 }
 
+func init(){
+	mapGrowCount.Store("count", 0)
+}
+
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ping",
@@ -75,6 +79,7 @@ func Route(w http.ResponseWriter, r *http.Request){
 
 func Put(w http.ResponseWriter, r *http.Request){
 	var err error
+	var code int = 400
 	elem := strings.Split(r.URL.Path, "/")
 	if len(elem) != 7 {
 		log.Println("len:", len(elem), " path:", r.URL.Path)
@@ -105,11 +110,18 @@ func Put(w http.ResponseWriter, r *http.Request){
 	_, ok := mapGrow.Load(key)
 	if ok {
 		mapGrow.Store(key, putg.Value)
+		code = http.StatusOK
 	} else{
 		mapGrow.LoadOrStore(key, putg.Value)
+		countInt, _ := mapGrowCount.Load("count")
+		count := countInt.(int)
+		count = count + 1
+		mapGrowCount.Store("count", count)
+		log.Println("inserted new record in memory:", count)
+		code = http.StatusCreated
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(code)
 }
 
 func Delete(w http.ResponseWriter, r *http.Request){
@@ -207,15 +219,20 @@ func Post(w http.ResponseWriter, r *http.Request){
 	defer r.Body.Close()
 
 	go func(grow []dataGrowth){
+		var cnew int = 0
 		for _, v := range grow {
 			year := strconv.Itoa(v.Year)
 			key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
 			_, ok := mapGrow.LoadOrStore(key, v.Value)
 			if !ok {
+				cnew++
 			}
 		}
-		mapGrowCount.Store("count", len(grow))
-		log.Println("map done:", len(grow))
+		countInt, _ := mapGrowCount.Load("count")
+		count := countInt.(int)
+		count = count + cnew
+		mapGrowCount.Store("count", count)
+		log.Println("successfully loaded data into memory:", count)
 	}(grow)
 
 	w.Header().Set("Content-Type", "application/json")
