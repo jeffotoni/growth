@@ -53,6 +53,7 @@ func main() {
 		})
 	mux.HandleFunc("/api/v1/growth",Route)
 	mux.HandleFunc("/api/v1/growth/post/status",GetStatus)
+	mux.HandleFunc("/api/v1/growth/size",GetSize)
 	mux.HandleFunc("/",Route)
 	server := &http.Server{
 		Addr:    "0.0.0.0:8080",
@@ -184,6 +185,19 @@ func Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(b)
+}
+
+func GetSize(w http.ResponseWriter, r *http.Request) {
+	var sizeInt int =0
+	var sizeStr string
+	size, ok := mapGrowCount.Load("count")
+	if ok {
+		sizeInt = size.(int)
+	}
+	sizeStr = strconv.Itoa(sizeInt)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"size":`+sizeStr+`}`))
 }
 
 func GetStatus(w http.ResponseWriter, r *http.Request){
