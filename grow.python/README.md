@@ -1,4 +1,4 @@
-# API Growth Python
+# API Growth Python 🐍
 
 Um simples exemplo de uma API executando um CRUD porém ele grava os dados em MEMÓRIA.
 
@@ -66,7 +66,7 @@ $ curl -i -XGET localhost:8080/api/v1/growth/brz/ngdp_r/2002
 Este endpoint irá fazer uma atualização na base de dados que está em memória, 
 se não existir o dado ele irá criar um novo. 
 ```bash
-$ curl -i -XPUT localhost:8080/api/v1/growth/brz/ngdp_r/2002 \
+$ curl -i -XPUT -H "Content-Type: application/json" localhost:8080/api/v1/growth/brz/ngdp_r/2002 \
 -d '{"value":333.98}'
 ```
 #### GET
