@@ -1,4 +1,4 @@
-# API Growth 💙 🐍 🦀
+# API Growth 💙 🦦 🐍 🦀
 
 Este repositório foi criado para colocarmos projetos em diversas linguagens com intúito totalmente didático 
 para colaborar com a comunidade e desenvolvedores como resolver o problema proposto com objetivo de

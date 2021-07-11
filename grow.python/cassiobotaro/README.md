@@ -52,7 +52,7 @@ localhost:8080/api/v1/growth -d @3mb-growth_json.json
 {"msg":"In progress"}
 ```
 
-#### GET
+#### GET 
 Com este endpoint conseguimos visualizar o status de como está o processamento que enviamos no [POST]
 ```bash
 $ curl -i -XGET -H "Content-Type:application/json" \
