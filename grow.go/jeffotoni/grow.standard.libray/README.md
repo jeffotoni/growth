@@ -49,7 +49,7 @@ Agora vamos testar nossa API 🦾
 Criando nossa base de dados na memória, esta requisição é assícrona irá ficar rodando em
 background.
 ```bash
-$ curl -i -XPOST localhost:8080/api/v1/growth -d @1mb-growth_json.json
+$ curl -i -XPOST localhost:8080/api/v1/growth -d @3mb-growth_json.json
 {"msg":"In progress"}
 ```
 
