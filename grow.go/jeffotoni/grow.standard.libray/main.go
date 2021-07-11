@@ -52,7 +52,9 @@ func Logger(name string) Adapter {
 			start := time.Now()
 			h.ServeHTTP(w, r)
 			log.Printf(
-				"%s \u001B[1;36m%s\u001B[0m \u001B[1;33m%s\u001B[0m \033[1;32m%s\033[0m",
+				"%s %s \u001B[1;36m%s\u001B[0m \u001B[1;33m%s\u001B[0m \u001B[0;34m%s\u001B[0m \033[1;32m%s\033[0m",
+				r.Header.Get("User-Agent"),
+				r.RequestURI,
 				r.Method,
 				r.RequestURI,
 				name,
@@ -78,7 +80,7 @@ func main() {
 		Middleware(http.HandlerFunc(
 			func (w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				w.Write([]byte("pong 1"))
+				w.Write([]byte("pong😍"))
 			}),
 			Logger(""),
 		))
@@ -129,6 +131,7 @@ func Put(w http.ResponseWriter, r *http.Request){
 	if len(elem) != 7 {
 		log.Println("len:", len(elem), " path:", r.URL.Path)
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Web.Server", "net/http")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"msg":"error in path"}`))
 		return
@@ -142,6 +145,7 @@ func Put(w http.ResponseWriter, r *http.Request){
 	err = json.NewDecoder(r.Body).Decode(&putg)
 	if err!=nil{
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Web.Server", "net/http")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"msg":"error in decode json value has to be float"}`))
 		return
@@ -166,6 +170,7 @@ func Put(w http.ResponseWriter, r *http.Request){
 		code = http.StatusCreated
 	}
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Web.Server", "net/http")
 	w.WriteHeader(code)
 }
 
@@ -175,6 +180,7 @@ func Delete(w http.ResponseWriter, r *http.Request){
 	if len(elem) != 7 {
 		log.Println("len:", len(elem), " path:", r.URL.Path)
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Web.Server", "net/http")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"msg":"error in path"}`))
 		return
@@ -190,6 +196,7 @@ func Delete(w http.ResponseWriter, r *http.Request){
 		code = http.StatusOK
 	}
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Web.Server", "net/http")
 	w.WriteHeader(code)
 }
 
@@ -201,6 +208,7 @@ func Get(w http.ResponseWriter, r *http.Request) {
 	if len(elem) != 7 {
 		log.Println("len:", len(elem), " path:", r.URL.Path)
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Web.Server", "net/http")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"msg":"error in path"}`))
 		return
@@ -227,6 +235,7 @@ func Get(w http.ResponseWriter, r *http.Request) {
 		code = http.StatusOK
 	}
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Web.Server", "net/http")
 	w.WriteHeader(code)
 	w.Write(b)
 }
@@ -240,6 +249,7 @@ func GetSize(w http.ResponseWriter, r *http.Request) {
 	}
 	sizeStr = strconv.Itoa(sizeInt)
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Web.Server", "net/http")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"size":`+sizeStr+`}`))
 }
@@ -248,6 +258,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request){
 	key, ok := mapGrow.Load("BRZNGDP_R2002")
 	if !ok {
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Web.Server", "net/http")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"msg":"not finished"}`))
 		return
@@ -261,6 +272,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request){
 	result := fmt.Sprintf("%.2f",key.(float64))
 	log.Println("value valid:",result)
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Web.Server", "net/http")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"msg":"complete","test value"":` +result+ `, "count":`+ count_str +`}`))
 }
@@ -294,6 +306,7 @@ func Post(w http.ResponseWriter, r *http.Request){
 	}(grow)
 
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Web.Server", "net/http")
 	w.WriteHeader(http.StatusAccepted)
 	w.Write([]byte(`{"msg":"In progress"}`))
 }
