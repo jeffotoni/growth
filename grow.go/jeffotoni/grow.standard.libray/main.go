@@ -11,13 +11,11 @@ import (
 	"time"
 )
 
-// docker build -t jeffotoni/apigrow -f Dockerfile .
-// docker run --rm -it -p 8080:8080 jeffotoni/apigrow
-// curl localhost:8080/ping
-var(
-	mapGrow sync.Map
+var (
+	mapGrow      sync.Map
 	mapGrowCount sync.Map
 )
+
 /* Example
 [
    {
@@ -41,7 +39,7 @@ type dataGrowth struct {
 	Year      int     `json:"Year"`
 }
 
-func init(){
+func init() {
 	mapGrowCount.Store("count", 0)
 }
 
@@ -78,7 +76,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.Handle("/ping",
 		Middleware(http.HandlerFunc(
-			func (w http.ResponseWriter, r *http.Request) {
+			func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte("pong😍"))
 			}),
@@ -86,7 +84,7 @@ func main() {
 		))
 	mux.Handle("/api/v1/growth",
 		Middleware(http.HandlerFunc(Route),
-		Logger(""),
+			Logger(""),
 		))
 	mux.Handle("/api/v1/growth/post/status",
 		Middleware(http.HandlerFunc(GetStatus),
@@ -109,7 +107,7 @@ func main() {
 	log.Fatal(server.ListenAndServe())
 }
 
-func Route(w http.ResponseWriter, r *http.Request){
+func Route(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		Get(w, r)
@@ -120,11 +118,11 @@ func Route(w http.ResponseWriter, r *http.Request){
 	case http.MethodPost:
 		Post(w, r)
 	default:
-		http.NotFound(w,r)
+		http.NotFound(w, r)
 	}
 }
 
-func Put(w http.ResponseWriter, r *http.Request){
+func Put(w http.ResponseWriter, r *http.Request) {
 	var err error
 	var code int = 400
 	elem := strings.Split(r.URL.Path, "/")
@@ -137,13 +135,13 @@ func Put(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	type putGrow struct{
+	type putGrow struct {
 		Value float64 `json:"value"`
 	}
 
 	var putg putGrow
 	err = json.NewDecoder(r.Body).Decode(&putg)
-	if err!=nil{
+	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Web.Server", "net/http")
 		w.WriteHeader(http.StatusBadRequest)
@@ -160,7 +158,7 @@ func Put(w http.ResponseWriter, r *http.Request){
 	if ok {
 		mapGrow.Store(key, putg.Value)
 		code = http.StatusOK
-	} else{
+	} else {
 		mapGrow.LoadOrStore(key, putg.Value)
 		countInt, _ := mapGrowCount.Load("count")
 		count := countInt.(int)
@@ -174,7 +172,7 @@ func Put(w http.ResponseWriter, r *http.Request){
 	w.WriteHeader(code)
 }
 
-func Delete(w http.ResponseWriter, r *http.Request){
+func Delete(w http.ResponseWriter, r *http.Request) {
 	var code int = 400
 	elem := strings.Split(r.URL.Path, "/")
 	if len(elem) != 7 {
@@ -241,7 +239,7 @@ func Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetSize(w http.ResponseWriter, r *http.Request) {
-	var sizeInt int =0
+	var sizeInt int = 0
 	var sizeStr string
 	size, ok := mapGrowCount.Load("count")
 	if ok {
@@ -251,10 +249,10 @@ func GetSize(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Web.Server", "net/http")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"size":`+sizeStr+`}`))
+	w.Write([]byte(`{"size":` + sizeStr + `}`))
 }
 
-func GetStatus(w http.ResponseWriter, r *http.Request){
+func GetStatus(w http.ResponseWriter, r *http.Request) {
 	key, ok := mapGrow.Load("BRZNGDP_R2002")
 	if !ok {
 		w.Header().Set("Content-Type", "application/json")
@@ -269,18 +267,18 @@ func GetStatus(w http.ResponseWriter, r *http.Request){
 	if ok {
 		count_str = strconv.Itoa(count.(int))
 	}
-	result := fmt.Sprintf("%.2f",key.(float64))
+	result := fmt.Sprintf("%.2f", key.(float64))
 	//log.Println("value valid:",result)
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Web.Server", "net/http")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"msg":"complete","test value"":` +result+ `, "count":`+ count_str +`}`))
+	w.Write([]byte(`{"msg":"complete","test value"":` + result + `, "count":` + count_str + `}`))
 }
 
-func Post(w http.ResponseWriter, r *http.Request){
+func Post(w http.ResponseWriter, r *http.Request) {
 	var grow []dataGrowth
 	err := json.NewDecoder(r.Body).Decode(&grow)
-	if err!=nil{
+	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"msg":"error in your json"}`))
@@ -288,7 +286,7 @@ func Post(w http.ResponseWriter, r *http.Request){
 	}
 	defer r.Body.Close()
 
-	go func(grow []dataGrowth){
+	go func(grow []dataGrowth) {
 		var cnew int = 0
 		for _, v := range grow {
 			year := strconv.Itoa(v.Year)
