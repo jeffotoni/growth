@@ -1,4 +1,4 @@
-# API Growth 🦦 
+# API Growth 🐿️ 
 
 Um simples exemplo de uma API executando um CRUD porém ele grava os dados em MEMÓRIA 
 legal não é 😍?. O objetivo é entender a construção de uma API Go usando somente a strand library. 
