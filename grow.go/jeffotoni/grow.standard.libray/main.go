@@ -129,7 +129,7 @@ func Put(w http.ResponseWriter, r *http.Request){
 	var code int = 400
 	elem := strings.Split(r.URL.Path, "/")
 	if len(elem) != 7 {
-		log.Println("len:", len(elem), " path:", r.URL.Path)
+		//log.Println("len:", len(elem), " path:", r.URL.Path)
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Web.Server", "net/http")
 		w.WriteHeader(http.StatusBadRequest)
@@ -166,7 +166,7 @@ func Put(w http.ResponseWriter, r *http.Request){
 		count := countInt.(int)
 		count = count + 1
 		mapGrowCount.Store("count", count)
-		log.Println("inserted new record in memory:", count)
+		//log.Println("inserted new record in memory:", count)
 		code = http.StatusCreated
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -178,7 +178,7 @@ func Delete(w http.ResponseWriter, r *http.Request){
 	var code int = 400
 	elem := strings.Split(r.URL.Path, "/")
 	if len(elem) != 7 {
-		log.Println("len:", len(elem), " path:", r.URL.Path)
+		//log.Println("len:", len(elem), " path:", r.URL.Path)
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Web.Server", "net/http")
 		w.WriteHeader(http.StatusBadRequest)
@@ -206,7 +206,7 @@ func Get(w http.ResponseWriter, r *http.Request) {
 	var code int = 400
 	elem := strings.Split(r.URL.Path, "/")
 	if len(elem) != 7 {
-		log.Println("len:", len(elem), " path:", r.URL.Path)
+		//log.Println("len:", len(elem), " path:", r.URL.Path)
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Web.Server", "net/http")
 		w.WriteHeader(http.StatusBadRequest)
@@ -270,7 +270,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request){
 		count_str = strconv.Itoa(count.(int))
 	}
 	result := fmt.Sprintf("%.2f",key.(float64))
-	log.Println("value valid:",result)
+	//log.Println("value valid:",result)
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Web.Server", "net/http")
 	w.WriteHeader(http.StatusOK)
