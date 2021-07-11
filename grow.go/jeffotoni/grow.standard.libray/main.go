@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 )
 
 // docker build -t jeffotoni/apigrow -f Dockerfile .
@@ -44,22 +45,65 @@ func init(){
 	mapGrowCount.Store("count", 0)
 }
 
+// Middleware Logger
+func Logger(name string) Adapter {
+	return func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			start := time.Now()
+			h.ServeHTTP(w, r)
+			log.Printf(
+				"%s \u001B[1;36m%s\u001B[0m \u001B[1;33m%s\u001B[0m \033[1;32m%s\033[0m",
+				r.Method,
+				r.RequestURI,
+				name,
+				time.Since(start),
+			)
+		})
+	}
+}
+
+type Adapter func(http.Handler) http.Handler
+
+// Middleware
+func Middleware(h http.Handler, adapters ...Adapter) http.Handler {
+	for _, adapter := range adapters {
+		h = adapter(h)
+	}
+	return h
+}
+
 func main() {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/ping",
-		func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("pong 1"))
-		})
-	mux.HandleFunc("/api/v1/growth",Route)
-	mux.HandleFunc("/api/v1/growth/post/status",GetStatus)
-	mux.HandleFunc("/api/v1/growth/size",GetSize)
-	mux.HandleFunc("/",Route)
+	mux.Handle("/ping",
+		Middleware(http.HandlerFunc(
+			func (w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte("pong 1"))
+			}),
+			Logger(""),
+		))
+	mux.Handle("/api/v1/growth",
+		Middleware(http.HandlerFunc(Route),
+		Logger(""),
+		))
+	mux.Handle("/api/v1/growth/post/status",
+		Middleware(http.HandlerFunc(GetStatus),
+			Logger(""),
+		))
+	mux.Handle("/api/v1/growth/size",
+		Middleware(http.HandlerFunc(GetSize),
+			Logger(""),
+		))
+	mux.Handle("/",
+		Middleware(http.HandlerFunc(Route),
+			Logger(""),
+		))
+
 	server := &http.Server{
 		Addr:    "0.0.0.0:8080",
 		Handler: mux,
 	}
-	log.Print("Run Server:8080")
+	log.Println("\033[1;44mRunning on http://0.0.0.0:8080 (Press CTRL+C to quit)\033[0m")
 	log.Fatal(server.ListenAndServe())
 }
 
@@ -246,7 +290,7 @@ func Post(w http.ResponseWriter, r *http.Request){
 		count := countInt.(int)
 		count = count + cnew
 		mapGrowCount.Store("count", count)
-		log.Println("successfully loaded data into memory:", count)
+		//log.Println("successfully loaded data into memory:", count)
 	}(grow)
 
 	w.Header().Set("Content-Type", "application/json")

@@ -66,6 +66,7 @@ grow.rust
         └── src
             └── main.rs
 ```
+
 Os endpoints que devem ser implementados estão listados logo abaixo, todos vamos seguir
 o mesmo padrão:
 
