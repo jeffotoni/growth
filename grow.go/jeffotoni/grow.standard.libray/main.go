@@ -257,7 +257,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Web.Server", "net/http")
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"msg":"not finished"}`))
 		return
 	}
@@ -280,7 +280,7 @@ func Post(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&grow)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"msg":"error in your json"}`))
 		return
 	}
