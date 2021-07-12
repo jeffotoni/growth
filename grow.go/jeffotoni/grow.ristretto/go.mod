@@ -1,4 +1,4 @@
-module grow.ristretto
+module github.com/jeffotoni/grow.go/jeffotoni/grow.ristretto
 
 go 1.16
 

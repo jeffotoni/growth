@@ -41,8 +41,8 @@ type dataGrowth struct {
 }
 
 func init() {
-	ristretto.Get("")
-	mapGrowCount.Store("count", 0)
+	ristretto.Set("count", "0")
+	//mapGrowCount.Store("count", 0)
 }
 
 // Middleware Logger
@@ -155,11 +155,11 @@ func Put(w http.ResponseWriter, r *http.Request) {
 		code = http.StatusOK
 	} else {
 		mapGrow.LoadOrStore(key, putg.Value)
-		countInt, _ := mapGrowCount.Load("count")
-		count := countInt.(int)
+		countStr := ristretto.Get("count")
+		count, _ := strconv.Atoi(countStr)
 		count = count + 1
-		mapGrowCount.Store("count", count)
-		//log.Println("inserted new record in memory:", count)
+		countStr = strconv.Itoa(count)
+		ristretto.Set("count", countStr)
 		code = http.StatusCreated
 	}
 	WriteService(w, r, code,"")
@@ -187,7 +187,6 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 
 func Get(w http.ResponseWriter, r *http.Request) {
 	var b []byte
-	var err error
 	var code int = 400
 	elem := strings.Split(r.URL.Path, "/")
 	if len(elem) != 7 {
@@ -199,10 +198,16 @@ func Get(w http.ResponseWriter, r *http.Request) {
 	Indicator := strings.ToUpper(elem[5])
 	year := elem[6]
 	key := country + Indicator + year
-	val, ok := mapGrow.Load(key)
-	if ok {
+	val := ristretto.Get(key)
+	if len(val)>0 {
 		var grow dataGrowth
-		grow.Value = val.(float64)
+		fval, err := strconv.ParseFloat(val,64)
+		if err != nil {
+			log.Println("error parse:" ,err.Error())
+			WriteService(w, r, code,`{"msg":"error parse float"}`)
+			return
+		}
+		grow.Value = fval
 		grow.Country = country
 		grow.Indicator = Indicator
 		grow.Year, _ = strconv.Atoi(year)
@@ -247,27 +252,26 @@ func Post(w http.ResponseWriter, r *http.Request) {
 	var grow []dataGrowth
 	err := json.NewDecoder(r.Body).Decode(&grow)
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"msg":"error in your json"}`))
+		WriteService(w, r, 400, `{"msg":"error in your json"}`)
 		return
 	}
 	defer r.Body.Close()
-
 	go func(grow []dataGrowth) {
 		var cnew int = 0
 		for _, v := range grow {
 			year := strconv.Itoa(v.Year)
 			key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
-			_, ok := mapGrow.LoadOrStore(key, v.Value)
-			if !ok {
+			sold := ristretto.Get(key)
+			if len(sold) == 0 {
 				cnew++
 			}
+			ristretto.Set(key, sold)
 		}
-		countInt, _ := mapGrowCount.Load("count")
-		count := countInt.(int)
+		countStr := ristretto.Get("count")
+		count, _ := strconv.Atoi(countStr)
 		count = count + cnew
-		mapGrowCount.Store("count", count)
+		countStr = strconv.Itoa(count)
+		ristretto.Set("count", countStr)
 	}(grow)
 		WriteService(w, r, 202, `{"msg":"In progress"}`)
 }

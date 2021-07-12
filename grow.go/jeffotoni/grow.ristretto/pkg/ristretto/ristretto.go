@@ -37,7 +37,7 @@ func Set(key, value string) bool {
 	}
 	cache := Run()
 	if cache.Set(key, value, 1) {
-		time.Sleep(10 * time.Millisecond)
+		time.Sleep(20 * time.Millisecond)
 		return true
 	}
 	return false
@@ -50,7 +50,7 @@ func Get(key string) string {
 	cache := Run()
 	value, found := cache.Get(key)
 	if !found {
-		log.Println("Not found!")
+		//log.Println("Not found!")
 		return ""
 	}
 	return value.(string)
