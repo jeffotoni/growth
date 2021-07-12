@@ -164,7 +164,6 @@ func Put(c *fiber.Ctx) (err error){
 	return c.Status(code).SendString("")
 }
 
-
 func Delete(c *fiber.Ctx) error {
 	c.Set("Content-Type", "application/json")
 	var code int = 400
