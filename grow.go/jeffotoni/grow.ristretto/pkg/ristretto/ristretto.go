@@ -37,6 +37,7 @@ func Set(key, value string) bool {
 	}
 	cache := Run()
 	cache.Set(key, value, 1)
+	return true
 }
 
 func Get(key string) string {
