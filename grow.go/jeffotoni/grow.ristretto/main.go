@@ -261,17 +261,20 @@ func Post(w http.ResponseWriter, r *http.Request) {
 		for _, v := range grow {
 			year := strconv.Itoa(v.Year)
 			key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
-			sold := ristretto.Get(key)
-			if len(sold) == 0 {
-				cnew++
-			}
-			ristretto.Set(key, sold)
+			sval := strconv.FormatFloat(v.Value,'E', -1, 64)
+			//sold := ristretto.Get(key)
+			//if len(sold) == 0 {
+			//	cnew++
+			//}
+
+			ristretto.Set(key, sval)
 		}
 		countStr := ristretto.Get("count")
 		count, _ := strconv.Atoi(countStr)
 		count = count + cnew
 		countStr = strconv.Itoa(count)
 		ristretto.Set("count", countStr)
+		log.Println("done")
 	}(grow)
 		WriteService(w, r, 202, `{"msg":"In progress"}`)
 }

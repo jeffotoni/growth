@@ -37,7 +37,7 @@ func Set(key, value string) bool {
 	}
 	cache := Run()
 	if cache.Set(key, value, 1) {
-		time.Sleep(20 * time.Millisecond)
+		//time.Sleep(20 * time.Millisecond)
 		return true
 	}
 	return false
