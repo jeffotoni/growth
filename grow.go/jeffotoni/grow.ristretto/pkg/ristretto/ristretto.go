@@ -20,7 +20,7 @@ func Run() *ristretto.Cache {
 		}
 		cacheOnce, err = ristretto.NewCache(&ristretto.Config{
 			NumCounters: 1e7,     // Num keys to track frequency of (30M).
-			MaxCost:     1 << 30, // Maximum cost of cache (2GB).
+			MaxCost:     1 << 30, // Maximum cost of cache (1GB).
 			BufferItems: 64,      // Number of keys per Get buffer.
 		})
 		if err != nil {
@@ -36,11 +36,7 @@ func Set(key, value string) bool {
 		return false
 	}
 	cache := Run()
-	if cache.Set(key, value, 1) {
-		//time.Sleep(20 * time.Millisecond)
-		return true
-	}
-	return false
+	cache.Set(key, value, 1)
 }
 
 func Get(key string) string {
