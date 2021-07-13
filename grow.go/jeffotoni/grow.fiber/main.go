@@ -178,6 +178,10 @@ func Delete(c *fiber.Ctx) error {
 	_, ok := mapGrow.Load(key)
 	if ok {
 		mapGrow.Delete(key)
+		countInt, _ := mapGrowCount.Load("count")
+		count := countInt.(int)
+		count = count -1
+		mapGrowCount.Store("count", count)
 		code = 200
 	}
 	return c.Status(code).SendString("")

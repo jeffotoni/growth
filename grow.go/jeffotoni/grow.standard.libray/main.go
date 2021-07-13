@@ -178,6 +178,10 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	_, ok := mapGrow.Load(key)
 	if ok {
 		mapGrow.Delete(key)
+		countInt, _ := mapGrowCount.Load("count")
+		count := countInt.(int)
+		count = count-1
+		mapGrowCount.Store("count", count)
 		code = http.StatusOK
 	}
 	WriteService(w, r, code,"")
