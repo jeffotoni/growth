@@ -34,6 +34,8 @@ type dataGrowth struct {
 	Year      int     `json:"Year"`
 }
 
+var fload bool = true
+
 func init() {
 	ristretto.Set("count", "0")
 }
@@ -173,6 +175,11 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	ok := ristretto.Get(key)
 	if len(ok) > 0  {
 		ristretto.Del(key)
+		countStr := ristretto.Get("count")
+		count, _ := strconv.Atoi(countStr)
+		count = count - 1
+		countStr = strconv.Itoa(count)
+		ristretto.Set("count", countStr)
 		code = http.StatusOK
 	}
 	WriteService(w, r, code,"")
@@ -220,7 +227,7 @@ func GetSize(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
-	result := ristretto.Get("BRZNGDP_R2002")
+	result := ristretto.Get("BRZNGDPX_R2002")
 	if len(result) == 0 {
 		WriteService(w, r, 400, `{"msg":"not finished"}`)
 		return
@@ -249,6 +256,12 @@ func Post(w http.ResponseWriter, r *http.Request) {
 				cnew++
 			}
 			ristretto.Set(key, sval)
+		}
+
+		if fload {
+			ristretto.Set("BRZNGDPX_R2002", "183.26")
+			cnew++
+			fload = false
 		}
 		countStr := ristretto.Get("count")
 		count, _ := strconv.Atoi(countStr)
