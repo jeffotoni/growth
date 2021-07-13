@@ -7,14 +7,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 	"github.com/jeffotoni/grow.go/jeffotoni/grow.ristretto/pkg/ristretto"
-)
-
-var (
-	mapGrow      sync.Map
-	mapGrowCount sync.Map
 )
 
 /* Example
@@ -42,7 +36,6 @@ type dataGrowth struct {
 
 func init() {
 	ristretto.Set("count", "0")
-	//mapGrowCount.Store("count", 0)
 }
 
 // Middleware Logger
@@ -149,12 +142,12 @@ func Put(w http.ResponseWriter, r *http.Request) {
 	Indicator := strings.ToUpper(elem[5])
 	year := elem[6]
 	key := country + Indicator + year
-	_, ok := mapGrow.Load(key)
-	if ok {
-		mapGrow.Store(key, putg.Value)
+	ok := ristretto.Get(key)
+	sval := fmt.Sprintf("%.2f", putg.Value)
+	ristretto.Set(key, sval)
+	if len(ok)>0 {
 		code = http.StatusOK
 	} else {
-		mapGrow.LoadOrStore(key, putg.Value)
 		countStr := ristretto.Get("count")
 		count, _ := strconv.Atoi(countStr)
 		count = count + 1
@@ -166,7 +159,7 @@ func Put(w http.ResponseWriter, r *http.Request) {
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {
-	var code int = 400
+	var code int = http.StatusNotAcceptable
 	elem := strings.Split(r.URL.Path, "/")
 	if len(elem) != 7 {
 		WriteService(w, r, code,`{"msg":"error in path"}`)
@@ -177,9 +170,9 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	Indicator := strings.ToUpper(elem[5])
 	year := elem[6]
 	key := country + Indicator + year
-	_, ok := mapGrow.Load(key)
-	if ok {
-		mapGrow.Delete(key)
+	ok := ristretto.Get(key)
+	if len(ok) > 0  {
+		ristretto.Del(key)
 		code = http.StatusOK
 	}
 	WriteService(w, r, code,"")
@@ -222,29 +215,18 @@ func Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetSize(w http.ResponseWriter, r *http.Request) {
-	var sizeInt int = 0
-	var sizeStr string
-	size, ok := mapGrowCount.Load("count")
-	if ok {
-		sizeInt = size.(int)
-	}
-	sizeStr = strconv.Itoa(sizeInt)
+	sizeStr := ristretto.Get("count")
 	WriteService(w, r, 200,`{"size":` + sizeStr + `}`)
 }
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
-	key, ok := mapGrow.Load("BRZNGDP_R2002")
-	if !ok {
+	result := ristretto.Get("BRZNGDP_R2002")
+	if len(result) == 0 {
 		WriteService(w, r, 400, `{"msg":"not finished"}`)
 		return
 	}
-
 	var count_str string
-	count, ok := mapGrowCount.Load("count")
-	if ok {
-		count_str = strconv.Itoa(count.(int))
-	}
-	result := fmt.Sprintf("%.2f", key.(float64))
+	count_str = ristretto.Get("count")
 	WriteService(w, r, 200, `{"msg":"complete","test value"":` + result + `, "count":` + count_str + `}`)
 }
 
@@ -261,12 +243,11 @@ func Post(w http.ResponseWriter, r *http.Request) {
 		for _, v := range grow {
 			year := strconv.Itoa(v.Year)
 			key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
-			sval := strconv.FormatFloat(v.Value,'E', -1, 64)
-			//sold := ristretto.Get(key)
-			//if len(sold) == 0 {
-			//	cnew++
-			//}
-
+			sval := fmt.Sprintf("%.2f",v.Value)
+			sold := ristretto.Get(key)
+			if len(sold) == 0 {
+				cnew++
+			}
 			ristretto.Set(key, sval)
 		}
 		countStr := ristretto.Get("count")
@@ -274,7 +255,6 @@ func Post(w http.ResponseWriter, r *http.Request) {
 		count = count + cnew
 		countStr = strconv.Itoa(count)
 		ristretto.Set("count", countStr)
-		log.Println("done")
 	}(grow)
 		WriteService(w, r, 202, `{"msg":"In progress"}`)
 }

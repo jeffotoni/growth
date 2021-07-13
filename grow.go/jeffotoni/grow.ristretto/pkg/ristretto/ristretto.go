@@ -47,8 +47,15 @@ func Get(key string) string {
 	cache := Run()
 	value, found := cache.Get(key)
 	if !found {
-		//log.Println("Not found!")
 		return ""
 	}
 	return value.(string)
+}
+
+func Del(key string) {
+	if len(key) <= 0 {
+		return
+	}
+	cache := Run()
+	cache.Del(key)
 }
