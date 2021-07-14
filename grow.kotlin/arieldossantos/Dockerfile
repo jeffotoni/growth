@@ -6,9 +6,6 @@ WORKDIR /app
 
 COPY . .
 
-COPY gradle /app/gradle
-COPY --chown=gradle:gradle . /app
-USER root
 RUN chown -R gradle /app
 
 RUN ./gradlew installDist || return 0
@@ -34,6 +31,7 @@ RUN /usr/lib/jvm/java-11-openjdk/bin/jlink \
 FROM alpine:latest
 
 ENV JAVA_HOME=/opt/java-minimal
+
 ENV PATH="$PATH:$JAVA_HOME/bin"
 
 COPY --from=packager "$JAVA_HOME" "$JAVA_HOME"
