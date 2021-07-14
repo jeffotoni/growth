@@ -1,6 +1,6 @@
 # API Growth <img width="25px" src="https://kotlinlang.org/assets/images/favicon.svg"/>
 
-Esta é a API Growth escrita e Kotlin, utilizando o framework KTOR!
+Esta é a API Growth escrita em Kotlin, utilizando o framework KTOR!
 
 ### Aviso
 
