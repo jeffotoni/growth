@@ -17,6 +17,9 @@ RUN ./configure --disable-all --disable-cgi --disable-phpdbg --disable-debug CFL
 RUN make \
     && make install
 
+RUN apk add upx \
+    && upx -9 /usr/local/bin/php
+
 FROM scratch
 
 COPY --from=builder /usr/local/bin/php /usr/local/bin/php
