@@ -22,7 +22,7 @@ app.post('/api/v1/growth',jsonParser, (req , res) => {
     map.set(key,value);
     i++;
   });
-  res.status(200).json({msg:"success", count:i});
+  res.status(202).json({msg:"success", count:i});
 })
 
 app.get('/api/v1/growth/:country/:indicator/:year', (req, res) => {
@@ -85,7 +85,7 @@ app.delete('/api/v1/growth/:country/:indicator/:year', (req, res) => {
   var key = country+indicator+year;
   var ok = map.delete(key.toUpperCase());
   if(ok){
-    res.status(200).json({msg:"success"});
+    res.status(202).json({msg:"success"});
   } else{
     res.status(200).json({msg:"not found value"});  
   }

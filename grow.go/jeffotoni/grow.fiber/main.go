@@ -112,7 +112,7 @@ func GetStatus(c *fiber.Ctx) error {
 	return c.Status(200).SendString(`{"msg":"complete","test value"":` + result + `, "count":` + count_str + `}`)
 }
 
-func GetSize(c *fiber.Ctx) error{
+func GetSize(c *fiber.Ctx) error {
 	c.Set("Content-Type", "application/json")
 	var sizeInt int = 0
 	var sizeStr string
@@ -124,14 +124,13 @@ func GetSize(c *fiber.Ctx) error{
 	return c.Status(200).SendString(`{"size":` + sizeStr + `}`)
 }
 
-
-func Put(c *fiber.Ctx) (err error){
+func Put(c *fiber.Ctx) (err error) {
 	c.Set("Content-Type", "application/json")
 	var code int = 400
 	country := strings.ToUpper(c.Params("country"))
 	Indicator := strings.ToUpper(c.Params("indicator"))
 	year := c.Params("year")
-	if len(country) == 0 || len(Indicator) ==0 || len(year) != 4 {
+	if len(country) == 0 || len(Indicator) == 0 || len(year) != 4 {
 		//log.Println("len:", len(elem), " path:", r.URL.Path)
 		c.Status(400).SendString(`{"msg":"error in path url"}`)
 		return
@@ -170,7 +169,7 @@ func Delete(c *fiber.Ctx) error {
 	country := strings.ToUpper(c.Params("country"))
 	Indicator := strings.ToUpper(c.Params("indicator"))
 	year := c.Params("year")
-	if len(country) == 0 || len(Indicator) ==0 || len(year) != 4 {
+	if len(country) == 0 || len(Indicator) == 0 || len(year) != 4 {
 		//log.Println("len:", len(elem), " path:", r.URL.Path)
 		return c.Status(400).SendString(`{"msg":"error in path url"}`)
 	}
@@ -180,9 +179,9 @@ func Delete(c *fiber.Ctx) error {
 		mapGrow.Delete(key)
 		countInt, _ := mapGrowCount.Load("count")
 		count := countInt.(int)
-		count = count -1
+		count = count - 1
 		mapGrowCount.Store("count", count)
-		code = 200
+		code = 202
 	}
 	return c.Status(code).SendString("")
 }
@@ -194,7 +193,7 @@ func Get(c *fiber.Ctx) (err error) {
 	country := strings.ToUpper(c.Params("country"))
 	Indicator := strings.ToUpper(c.Params("indicator"))
 	year := c.Params("year")
-	if len(country) == 0 || len(Indicator) ==0 || len(year) != 4 {
+	if len(country) == 0 || len(Indicator) == 0 || len(year) != 4 {
 		return c.Status(400).SendString(`{"msg":"error in path url"}`)
 	}
 	key := country + Indicator + year

@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
 	"github.com/jeffotoni/grow.go/jeffotoni/grow.ristretto/pkg/ristretto"
 )
 
@@ -124,7 +125,7 @@ func Put(w http.ResponseWriter, r *http.Request) {
 	var code int = 400
 	elem := strings.Split(r.URL.Path, "/")
 	if len(elem) != 7 {
-		WriteService(w, r, code,`{"msg":"error in path"}`)
+		WriteService(w, r, code, `{"msg":"error in path"}`)
 		return
 	}
 
@@ -135,7 +136,7 @@ func Put(w http.ResponseWriter, r *http.Request) {
 	var putg putGrow
 	err = json.NewDecoder(r.Body).Decode(&putg)
 	if err != nil {
-		WriteService(w, r, code,`{"msg":"error in decode json value has to be float"}`)
+		WriteService(w, r, code, `{"msg":"error in decode json value has to be float"}`)
 		return
 	}
 	defer r.Body.Close()
@@ -147,7 +148,7 @@ func Put(w http.ResponseWriter, r *http.Request) {
 	ok := ristretto.Get(key)
 	sval := fmt.Sprintf("%.2f", putg.Value)
 	ristretto.Set(key, sval)
-	if len(ok)>0 {
+	if len(ok) > 0 {
 		code = http.StatusOK
 	} else {
 		countStr := ristretto.Get("count")
@@ -157,14 +158,14 @@ func Put(w http.ResponseWriter, r *http.Request) {
 		ristretto.Set("count", countStr)
 		code = http.StatusCreated
 	}
-	WriteService(w, r, code,"")
+	WriteService(w, r, code, "")
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {
 	var code int = http.StatusNotAcceptable
 	elem := strings.Split(r.URL.Path, "/")
 	if len(elem) != 7 {
-		WriteService(w, r, code,`{"msg":"error in path"}`)
+		WriteService(w, r, code, `{"msg":"error in path"}`)
 		return
 	}
 
@@ -173,16 +174,16 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	year := elem[6]
 	key := country + Indicator + year
 	ok := ristretto.Get(key)
-	if len(ok) > 0  {
+	if len(ok) > 0 {
 		ristretto.Del(key)
 		countStr := ristretto.Get("count")
 		count, _ := strconv.Atoi(countStr)
 		count = count - 1
 		countStr = strconv.Itoa(count)
 		ristretto.Set("count", countStr)
-		code = http.StatusOK
+		code = http.StatusAccepted
 	}
-	WriteService(w, r, code,"")
+	WriteService(w, r, code, "")
 }
 
 func Get(w http.ResponseWriter, r *http.Request) {
@@ -190,7 +191,7 @@ func Get(w http.ResponseWriter, r *http.Request) {
 	var code int = 400
 	elem := strings.Split(r.URL.Path, "/")
 	if len(elem) != 7 {
-		WriteService(w, r, code,`{"msg":"error in path"}`)
+		WriteService(w, r, code, `{"msg":"error in path"}`)
 		return
 	}
 
@@ -199,12 +200,12 @@ func Get(w http.ResponseWriter, r *http.Request) {
 	year := elem[6]
 	key := country + Indicator + year
 	val := ristretto.Get(key)
-	if len(val)>0 {
+	if len(val) > 0 {
 		var grow dataGrowth
-		fval, err := strconv.ParseFloat(val,64)
+		fval, err := strconv.ParseFloat(val, 64)
 		if err != nil {
-			log.Println("error parse:" ,err.Error())
-			WriteService(w, r, code,`{"msg":"error parse float"}`)
+			log.Println("error parse:", err.Error())
+			WriteService(w, r, code, `{"msg":"error parse float"}`)
 			return
 		}
 		grow.Value = fval
@@ -213,17 +214,17 @@ func Get(w http.ResponseWriter, r *http.Request) {
 		grow.Year, _ = strconv.Atoi(year)
 		b, err = json.Marshal(&grow)
 		if err != nil {
-			WriteService(w, r, code,`{"msg":"error marshal:` + err.Error() + `"}`)
+			WriteService(w, r, code, `{"msg":"error marshal:`+err.Error()+`"}`)
 			return
 		}
 		code = http.StatusOK
 	}
-	WriteService(w, r, code,string(b))
+	WriteService(w, r, code, string(b))
 }
 
 func GetSize(w http.ResponseWriter, r *http.Request) {
 	sizeStr := ristretto.Get("count")
-	WriteService(w, r, 200,`{"size":` + sizeStr + `}`)
+	WriteService(w, r, 200, `{"size":`+sizeStr+`}`)
 }
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
@@ -234,7 +235,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 	}
 	var count_str string
 	count_str = ristretto.Get("count")
-	WriteService(w, r, 200, `{"msg":"complete","test value"":` + result + `, "count":` + count_str + `}`)
+	WriteService(w, r, 200, `{"msg":"complete","test value"":`+result+`, "count":`+count_str+`}`)
 }
 
 func Post(w http.ResponseWriter, r *http.Request) {
@@ -250,7 +251,7 @@ func Post(w http.ResponseWriter, r *http.Request) {
 		for _, v := range grow {
 			year := strconv.Itoa(v.Year)
 			key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
-			sval := fmt.Sprintf("%.2f",v.Value)
+			sval := fmt.Sprintf("%.2f", v.Value)
 			sold := ristretto.Get(key)
 			if len(sold) == 0 {
 				cnew++
@@ -269,10 +270,10 @@ func Post(w http.ResponseWriter, r *http.Request) {
 		countStr = strconv.Itoa(count)
 		ristretto.Set("count", countStr)
 	}(grow)
-		WriteService(w, r, 202, `{"msg":"In progress"}`)
+	WriteService(w, r, 202, `{"msg":"In progress"}`)
 }
 
-func WriteService(w http.ResponseWriter, r *http.Request, code int, msg string){
+func WriteService(w http.ResponseWriter, r *http.Request, code int, msg string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Web.Server", "net/http")
 	w.WriteHeader(code)
