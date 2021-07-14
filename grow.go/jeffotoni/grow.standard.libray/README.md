@@ -86,7 +86,7 @@ localhost:8080/api/v1/growth/brz/ngdp_r/2002
 #### DELETE
 Este endpoint irá remove o dado de nossa base de dados memória.
 ```bash
-$ curl -i -XPUT -H "Content-Type:application/json" \
+$ curl -i -XDELETE -H "Content-Type:application/json" \
 localhost:8080/api/v1/growth/brz/ngdp_r/2002 
 ```
 #### GET
