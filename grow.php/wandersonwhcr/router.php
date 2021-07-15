@@ -46,6 +46,7 @@ foreach ($routes as $route) {
     if ('*' === $route['method'] || $_SERVER['REQUEST_METHOD'] === $route['method']) {
         if (preg_match(sprintf('#%s#', $route['uri']), $_SERVER['REQUEST_URI'], $matches) === 1) {
             call_user_func(new $route['action']($_SERVER), $matches);
+            break;
         }
     }
 }
