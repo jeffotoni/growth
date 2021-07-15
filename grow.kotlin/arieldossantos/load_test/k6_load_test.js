@@ -1,6 +1,9 @@
 import http from 'k6/http';
 import { sleep, check } from 'k6';
 
+
+const SERVER_URL = "http://host.docker.internal:8080"
+
 export let options = {
   vus: 100,
   duration: '30s',
@@ -25,21 +28,21 @@ export default function () {
                       }
                    ]
 
-    var resGetPing = http.get('http://localhost:8080/ping');
-    var resGetStatus = http.get('http://localhost:8080/api/v1/growth/post/status');
-    var resGet = http.get('http://localhost:8080/api/v1/growth/brz/ngdp_r/2002');
+    var resGetPing = http.get(SERVER_URL + '/ping');
+    var resGetStatus = http.get(SERVER_URL + '/api/v1/growth/post/status');
+    var resGet = http.get(SERVER_URL + '/api/v1/growth/brz/ngdp_r/2002');
      var resPut = http.put(
-          'http://localhost:8080/api/v1/growth/brz/ngdp_r/2002',
+          SERVER_URL + '/api/v1/growth/brz/ngdp_r/2002',
           JSON.stringify(dataPut),
           { headers }
         );
     var resPost = http.post(
-                           'http://localhost:8080/api/v1/growth',
+                           SERVER_URL + '/api/v1/growth',
                            JSON.stringify(dataPost),
                            { headers }
                          );
-    var resDelete = http.del('http://localhost:8080/api/v1/growth/brz/ngdp_r/2002');
-    var resGetSize = http.get('http://localhost:8080/api/v1/growth/size');
+    var resDelete = http.del(SERVER_URL + '/api/v1/growth/brz/ngdp_r/2002');
+    var resGetSize = http.get(SERVER_URL + '/api/v1/growth/size');
 
 
     check(resGetPing, {
