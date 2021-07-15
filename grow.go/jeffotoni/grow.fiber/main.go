@@ -42,6 +42,7 @@ type dataGrowth struct {
 
 func init() {
 	mapGrowCount.Store("count", 0)
+	mapGrow.Store(("BRZNGDPX_R2002", "183.26")
 }
 
 func main() {
@@ -77,12 +78,15 @@ func Post(c *fiber.Ctx) error {
 	}
 	var numJobs = len(grow)
 	var jobs = make(chan dataGrowth, numJobs)
-	for w := 0; w < 5000; w++ {
+	for w := 0; w < 500; w++ {
 		go worker(w, jobs)
 	}
-	for j := 0; j < numJobs; j++ {
-		jobs <- grow[j]
+	for _, tgrow := range grow {
+		jobs <- tgrow
 	}
+	// for j := 0; j < numJobs; j++ {
+	// 	jobs <- grow[j]
+	// }
 	close(jobs)
 	return c.Status(202).SendString(`{"msg":"In progress"}`)
 }
@@ -163,7 +167,6 @@ func Put(c *fiber.Ctx) (err error) {
 		count := countInt.(int)
 		count = count + 1
 		mapGrowCount.Store("count", count)
-		//log.Println("inserted new record in memory:", count)
 		code = 201
 	}
 	return c.Status(code).SendString("")
