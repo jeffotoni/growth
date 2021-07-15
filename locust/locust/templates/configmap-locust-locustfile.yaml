@@ -1,0 +1,10 @@
+{{- if eq .Values.loadtest.locust_locustfile_configmap "" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "locust.fullname" . }}-locustfile
+  labels:
+{{ include "locust.labels" . | indent 4 }}
+data:
+{{ ($.Files.Glob (printf "locustfiles/%s/main.py" .Values.loadtest.name)).AsConfig | indent 2 }}
+{{- end }}

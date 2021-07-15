@@ -57,7 +57,7 @@ app.get("/api/v1/growth/size", (req, res) => {
   }
 });
 
-app.get("/api/v1/growth/status", (req, res) => {
+app.get("/api/v1/growth/post/status", (req, res) => {
   res.setHeader("Content-Type", "application/json");
   var val = map.get("BRZNGDP_R2002");
   if (val) {

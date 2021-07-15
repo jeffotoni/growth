@@ -3,14 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 	"sync"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 var (
@@ -49,11 +47,11 @@ func init() {
 func main() {
 	app := fiber.New(fiber.Config{BodyLimit: 10 * 1024 * 1024})
 	app.Use(cors.New())
-	app.Use(logger.New(logger.Config{
-		Format:     "${pid} ${time} ${method} ${path} - ${ip} - \u001B[0;34m${status}\u001B[0m - \033[1;32m${latency}\033[0m\n",
-		TimeFormat: "02-Jan-2006 15:04:05",
-		Output:     os.Stdout,
-	}))
+	// app.Use(logger.New(logger.Config{
+	// 	Format:     "${pid} ${time} ${method} ${path} - ${ip} - \u001B[0;34m${status}\u001B[0m - \033[1;32m${latency}\033[0m\n",
+	// 	TimeFormat: "02-Jan-2006 15:04:05",
+	// 	Output:     os.Stdout,
+	// }))
 
 	app.Get("/ping", Ping)
 	app.Post("/api/v1/growth", Post)

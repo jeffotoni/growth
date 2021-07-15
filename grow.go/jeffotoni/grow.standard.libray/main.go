@@ -80,24 +80,19 @@ func main() {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte("pong😍"))
 			}),
-			Logger(""),
+		//Logger(""),
 		))
 	mux.Handle("/api/v1/growth",
-		Middleware(http.HandlerFunc(Route),
-			Logger(""),
-		))
+		Middleware(http.HandlerFunc(Route))) //Logger(""),
+
 	mux.Handle("/api/v1/growth/post/status",
-		Middleware(http.HandlerFunc(GetStatus),
-			Logger(""),
-		))
+		Middleware(http.HandlerFunc(GetStatus))) //Logger(""),
+
 	mux.Handle("/api/v1/growth/size",
-		Middleware(http.HandlerFunc(GetSize),
-			Logger(""),
-		))
+		Middleware(http.HandlerFunc(GetSize))) //Logger(""),
+
 	mux.Handle("/",
-		Middleware(http.HandlerFunc(Route),
-			Logger(""),
-		))
+		Middleware(http.HandlerFunc(Route))) //Logger(""),
 
 	server := &http.Server{
 		Addr:    "0.0.0.0:8080",

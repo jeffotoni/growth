@@ -1,0 +1,126 @@
+loadtest:
+  # loadtest.name -- a name used for resources and settings in this load test
+  name: example
+  # loadtest.locust_locustfile -- the name of the locustfile
+  locust_locustfile: main.py
+  # loadtest.locust_locustfile_configmap -- name of a configmap containing your locustfile
+  locust_locustfile_configmap: ""
+  # loadtest.locust_lib_configmap -- name of a configmap containing your lib
+  locust_lib_configmap: ""
+  # loadtest.locust_host -- the host you will load test
+  locust_host: https://www.google.com
+  # loadtest.pip_packages -- a list of extra python pip packages to install
+  pip_packages: []
+  # loadtest.environment -- environment variables used in the load test for both master and workers
+  environment: {}
+    # VAR: VALUE
+  # loadtest.headless -- whether to run locust with headless settings
+  headless: false
+
+image:
+  repository: locustio/locust
+  tag: 1.4.3
+  pullPolicy: IfNotPresent
+
+service:
+  type: LoadBalancer
+  annotations:
+    cloud.google.com/load-balancer-type: "Internal"
+    networking.gke.io/internal-load-balancer-allow-global-access: "true"
+  extraLabels: {}
+
+master:
+  # master.image -- A custom docker image including tag
+  image: ""
+  # master.logLevel -- Log level. Can be INFO or DEBUG
+  logLevel: INFO
+  # master.resources -- resources for the locust master
+  resources: {}
+    # limits:
+    #   cpu: 2000m
+    #   memory: 1024Mi
+    # requests:
+    #   cpu: 1000m
+    #   memory: 1024Mi
+  serviceAccountAnnotations: {}
+  # master.environment -- environment variables for the master
+  environment: {}
+  # master.args_include_default -- Whether to include default command args
+  args_include_default: true
+  # master.args -- Any extra command args for the master
+  args: []
+  command:
+    - sh
+    - /config/docker-entrypoint.sh
+  strategy:
+    type: RollingUpdate
+  # master.pdb.enabled -- Whether to create a PodDisruptionBudget for the master pod
+  pdb:
+    enabled: false
+
+worker:
+  # worker.image -- A custom docker image including tag
+  image: ""
+  # worker.logLevel -- Log level. Can be INFO or DEBUG
+  logLevel: INFO
+  replicas: 6
+  hpa:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 40
+  # worker.resources -- resources for the locust worker
+  resources: {}
+    # limits:
+    #   cpu: 500m
+    #   memory: 256Mi
+    # requests:
+    #   cpu: 500m
+    #   memory: 256Mi
+  serviceAccountAnnotations: {}
+  # worker.environment -- environment variables for the workers
+  environment: {}
+  # worker.args_include_default -- Whether to include default command args
+  args_include_default: true
+  # worker.args -- Any extra command args for the workers
+  args: []
+  command:
+    - sh
+    - /config/docker-entrypoint.sh
+  strategy:
+    type: RollingUpdate
+
+nameOverride: ""
+fullnameOverride: ""
+imagePullSecrets: []
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      path: /
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+# extraConfigMaps -- Any extra configmaps to mount for the master and worker. Can be used for extra python packages
+extraConfigMaps: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
+extraLabels: {}
