@@ -32,8 +32,9 @@ class Create
 
         header('HTTP/1.1 201 Created');
 
-        $key = sprintf('%s-%s-%s', $args['country'], $args['indicator'], $args['year']);
+        $key = sprintf('growth-%s-%s-%s', $args['country'], $args['indicator'], $args['year']);
 
         apcu_store($key, $data);
+        apcu_inc('growth-count');
     }
 }

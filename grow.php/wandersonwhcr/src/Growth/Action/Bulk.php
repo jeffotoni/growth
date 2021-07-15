@@ -37,9 +37,10 @@ class Bulk
 
         // TODO Async
         foreach ($dataset as $data) {
-            $key = sprintf('%s-%s-%s', $data->Country, $data->Indicator, $data->Year);
+            $key = sprintf('growth-%s-%s-%s', $data->Country, $data->Indicator, $data->Year);
 
             apcu_store($key, $data);
+            apcu_inc('growth-count');
         }
 
         header('HTTP/1.1 201 Accepted');
