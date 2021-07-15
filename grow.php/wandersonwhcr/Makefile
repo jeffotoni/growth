@@ -11,3 +11,10 @@ base:
 	docker build . \
 		--build-arg PHP_VERSION=${PHP_VERSION} \
 		--tag wandersonwhcr/php:${PHP_VERSION}-cli
+
+.PHONY: dev
+dev: base
+	docker run --rm --interactive --tty \
+		--publish 8080:8080 \
+		--volume `pwd`/router.php:/app/router.php:ro \
+		wandersonwhcr/php:${PHP_VERSION}-cli
