@@ -2,7 +2,7 @@
 
 namespace Growth\Action;
 
-class Find
+class Remove
 {
     protected array $server;
 
@@ -15,11 +15,8 @@ class Find
             return;
         }
 
-        $data = apcu_fetch($key);
+        apcu_delete($key);
 
-        header('HTTP/1.1 200 OK');
-        header('Content-Type: application/json');
-
-        file_put_contents('php://output', json_encode($data));
+        header('HTTP/1.1 204 No Content');
     }
 }

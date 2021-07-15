@@ -40,7 +40,7 @@ $routes = [
     [
         'method' => 'DELETE',
         'uri'    => '^/api/v1/growth/(?<country>[^/]+)/(?<indicator>[^/]+)/(?<year>[0-9]+)$',
-        'action' => Growth\Action\Delete::class,
+        'action' => Growth\Action\Remove::class,
     ],
     [
         'method' => '*',
