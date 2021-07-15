@@ -1,5 +1,9 @@
 <?php
 
+spl_autoload_register(function ($classname) {
+    require sprintf('./src/%s.php', strtr($classname, '\\', '/'));
+});
+
 $routes = [
     [
         'method' => 'POST',
@@ -31,21 +35,17 @@ $routes = [
         'uri'    => '^/api/v1/growth/(?<country>[^/]+)/(?<indicator>[^/]+)/(?<year>[0-9]+)$',
         'action' => Growth\Action\Delete::class,
     ],
+    [
+        'method' => '*',
+        'uri'    => '^.*$',
+        'action' => Growth\Action\NotFound::class,
+    ],
 ];
 
-$found = false;
-
 foreach ($routes as $route) {
-    $found =
-        $_SERVER['REQUEST_METHOD'] === $route['method']
-        && preg_match(sprintf('#%s#', $route['uri']), $_SERVER['REQUEST_URI'], $matches) === 1;
-
-    if ($found) {
-        var_dump($route);
-        break;
+    if ('*' === $route['method'] || $_SERVER['REQUEST_METHOD'] === $route['method']) {
+        if (preg_match(sprintf('#%s#', $route['uri']), $_SERVER['REQUEST_URI'], $matches) === 1) {
+            call_user_func(new $route['action']($_SERVER), $matches);
+        }
     }
-}
-
-if (! $found) {
-    var_dump(null);
 }
