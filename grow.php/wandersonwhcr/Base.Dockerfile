@@ -1,6 +1,7 @@
-FROM alpine:3.14 AS builder
+FROM alpine:3.14
 
 ARG PHP_VERSION
+ARG PECL_APCU_VERSION
 
 RUN mkdir -p /usr/src \
     && cd /usr/src \
@@ -9,9 +10,9 @@ RUN mkdir -p /usr/src \
     && mv php-src-php-${PHP_VERSION} php
 
 RUN cd /usr/src/php/ext \
-    && wget -q https://pecl.php.net/get/apcu-5.1.20.tgz \
-    && tar -xzf apcu-5.1.20.tgz \
-    && mv apcu-5.1.20 apcu
+    && wget -q https://pecl.php.net/get/apcu-${PECL_APCU_VERSION}.tgz \
+    && tar -xzf apcu-${PECL_APCU_VERSION}.tgz \
+    && mv apcu-${PECL_APCU_VERSION} apcu
 
 WORKDIR /usr/src/php
 
@@ -24,18 +25,10 @@ RUN ./configure --disable-all --disable-cgi --disable-phpdbg --disable-debug --e
 RUN make \
     && make install
 
-RUN apk add upx \
-    && upx -9 /usr/local/bin/php
-
-FROM scratch
-
-COPY --from=builder /usr/local/bin/php /usr/local/bin/php
-COPY --from=builder /lib/ld-musl-x86_64.so.1 /lib/ld-musl-x86_64.so.1
+WORKDIR "/app"
 
 ENTRYPOINT ["/usr/local/bin/php"]
 
-CMD ["-S", "0.0.0.0:8080", "/app/router.php"]
-
-WORKDIR "/app"
+CMD ["-S", "0.0.0.0:8080", "router.php"]
 
 EXPOSE 8080
