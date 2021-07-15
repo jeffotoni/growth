@@ -7,7 +7,7 @@ const SERVER_URL = "http://host.docker.internal:8080"
 export let options = {
   vus: 100,
   duration: '30s',
-  iterations: 100
+  iterations: 1000
 };
 
 export default function () {
