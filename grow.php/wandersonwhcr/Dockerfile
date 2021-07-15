@@ -8,13 +8,18 @@ RUN mkdir -p /usr/src \
     && tar -xzf php-${PHP_VERSION}.tar.gz \
     && mv php-src-php-${PHP_VERSION} php
 
+RUN cd /usr/src/php/ext \
+    && wget -q https://pecl.php.net/get/apcu-5.1.20.tgz \
+    && tar -xzf apcu-5.1.20.tgz \
+    && mv apcu-5.1.20 apcu
+
 WORKDIR /usr/src/php
 
 RUN apk add alpine-sdk autoconf automake libtool \
     && apk add bison re2c \
     && ./buildconf --force
 
-RUN ./configure --disable-all --disable-cgi --disable-phpdbg --disable-debug CFLAGS="-O3 -march=native"
+RUN ./configure --disable-all --disable-cgi --disable-phpdbg --disable-debug --enable-apcu CFLAGS="-O3 -march=native"
 
 RUN make \
     && make install
