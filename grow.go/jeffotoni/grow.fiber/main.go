@@ -77,7 +77,7 @@ func Post(c *fiber.Ctx) error {
 	}
 	var numJobs = len(grow)
 	var jobs = make(chan dataGrowth, numJobs)
-	for w := 0; w < 50; w++ {
+	for w := 0; w < 5000; w++ {
 		go worker(w, jobs)
 	}
 	for j := 0; j < numJobs; j++ {

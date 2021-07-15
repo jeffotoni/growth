@@ -45,7 +45,8 @@ type dataGrowth struct {
 }
 
 func init() {
-	mapGrowCount.Store("count", 0)
+	mapGrowCount.Store("count", 1)
+	mapGrow.Store("BRZNGDPX_R2002", "183.26")
 }
 
 // Middleware Logger
@@ -188,7 +189,7 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 }
 
 func Get(w http.ResponseWriter, r *http.Request) {
-	var b []byte
+	var b = []byte(`{}`)
 	var err error
 	var code int = 400
 	elem := strings.Split(r.URL.Path, "/")
@@ -213,8 +214,8 @@ func Get(w http.ResponseWriter, r *http.Request) {
 			WriteService(w, r, code, `{"msg":"error marshal:`+err.Error()+`"}`)
 			return
 		}
-		code = http.StatusOK
 	}
+	code = http.StatusOK
 	WriteService(w, r, code, string(b))
 }
 
@@ -258,7 +259,7 @@ func Post(w http.ResponseWriter, r *http.Request) {
 
 	var numJobs = len(grow)
 	var jobs = make(chan dataGrowth, numJobs)
-	for w := 0; w < 50; w++ {
+	for w := 0; w < 500; w++ {
 		go worker(w, jobs)
 	}
 	for j := 0; j < numJobs; j++ {
@@ -274,6 +275,7 @@ func worker(id int, grow <-chan dataGrowth) {
 	for v := range grow {
 		year := strconv.Itoa(v.Year)
 		key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
+		fmt.Sprintf("%s", key)
 		_, ok := mapGrow.LoadOrStore(key, v.Value)
 		if !ok {
 			cnew++
