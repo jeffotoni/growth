@@ -1,6 +1,6 @@
-ARG PHP_VERSION
+ARG DOCKER_IMAGE_TAG
 
-FROM wandersonwhcr/php:${PHP_VERSION}-cli AS base
+FROM ${DOCKER_IMAGE_TAG} AS base
 
 RUN apk add upx \
     && upx -9 /usr/local/bin/php

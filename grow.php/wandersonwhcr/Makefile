@@ -5,9 +5,6 @@ GIT_SHA_SHORT=$(shell git rev-parse --short HEAD)
 .PHONY: all
 all: build
 
-.PHONY: build
-build: base
-
 .PHONY: base
 base:
 	docker build . \
@@ -23,9 +20,16 @@ dev: base
 		--volume `pwd`:/app:ro \
 		wandersonwhcr/php:${PHP_VERSION}-cli
 
-.PHONY: artifact
-artifact: base
+.PHONY: build
+build: base
 	docker build . \
-		--file Artifact.Dockerfile \
-		--build-arg PHP_VERSION=${PHP_VERSION} \
+		--file Dockerfile \
+		--build-arg DOCKER_IMAGE_TAG=wandersonwhcr/php:${PHP_VERSION}-cli \
 		--tag wandersonwhcr/growth:${GIT_SHA_SHORT}
+	docker tag wandersonwhcr/growth:${GIT_SHA_SHORT} wandersonwhcr/growth:latest
+
+.PHONY: stage
+stage: build
+	docker run --rm --interactive --tty \
+		--publish 8080:8080 \
+		wandersonwhcr/growth:${GIT_SHA_SHORT}
