@@ -35,10 +35,10 @@ type dataGrowth struct {
 	Year      int     `json:"Year"`
 }
 
-var fload bool = true
-
 func init() {
 	ristretto.Set("count", "0")
+	ristretto.Set("BRZNGDPX_R2002", "183.26")
+	ristretto.Set("count", "1")
 }
 
 // Middleware Logger
@@ -241,31 +241,36 @@ func Post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer r.Body.Close()
-	go func(grow []dataGrowth) {
-		var cnew int = 0
-		for _, v := range grow {
-			year := strconv.Itoa(v.Year)
-			key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
-			sval := fmt.Sprintf("%.2f", v.Value)
-			sold := ristretto.Get(key)
-			if len(sold) == 0 {
-				cnew++
-			}
-			ristretto.Set(key, sval)
-		}
+	var numJobs = len(grow)
+	var jobs = make(chan dataGrowth, numJobs)
+	for w := 0; w < 50; w++ {
+		go worker(w, jobs)
+	}
+	for j := 0; j < numJobs; j++ {
+		jobs <- grow[j]
+	}
+	close(jobs)
 
-		if fload {
-			ristretto.Set("BRZNGDPX_R2002", "183.26")
-			cnew++
-			fload = false
-		}
-		countStr := ristretto.Get("count")
-		count, _ := strconv.Atoi(countStr)
-		count = count + cnew
-		countStr = strconv.Itoa(count)
-		ristretto.Set("count", countStr)
-	}(grow)
 	WriteService(w, r, 202, `{"msg":"In progress"}`)
+}
+
+func worker(id int, grow <-chan dataGrowth) {
+	var cnew int = 0
+	for v := range grow {
+		year := strconv.Itoa(v.Year)
+		key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
+		sval := fmt.Sprintf("%.2f", v.Value)
+		sold := ristretto.Get(key)
+		if len(sold) == 0 {
+			cnew++
+		}
+		ristretto.Set(key, sval)
+	}
+	countStr := ristretto.Get("count")
+	count, _ := strconv.Atoi(countStr)
+	count = count + cnew
+	countStr = strconv.Itoa(count)
+	ristretto.Set("count", countStr)
 }
 
 func WriteService(w http.ResponseWriter, r *http.Request, code int, msg string) {

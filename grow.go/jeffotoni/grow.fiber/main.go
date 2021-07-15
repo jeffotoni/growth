@@ -75,24 +75,32 @@ func Post(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).SendString(`{"msg":"error in your json"}`)
 	}
-
-	go func(grow []dataGrowth) {
-		var cnew int = 0
-		for _, v := range grow {
-			year := strconv.Itoa(v.Year)
-			key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
-			_, ok := mapGrow.LoadOrStore(key, v.Value)
-			if !ok {
-				cnew++
-			}
-		}
-		countInt, _ := mapGrowCount.Load("count")
-		count := countInt.(int)
-		count = count + cnew
-		mapGrowCount.Store("count", count)
-	}(grow)
-
+	var numJobs = len(grow)
+	var jobs = make(chan dataGrowth, numJobs)
+	for w := 0; w < 50; w++ {
+		go worker(w, jobs)
+	}
+	for j := 0; j < numJobs; j++ {
+		jobs <- grow[j]
+	}
+	close(jobs)
 	return c.Status(202).SendString(`{"msg":"In progress"}`)
+}
+
+func worker(id int, grow <-chan dataGrowth) {
+	var cnew int = 0
+	for v := range grow {
+		year := strconv.Itoa(v.Year)
+		key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
+		_, ok := mapGrow.LoadOrStore(key, v.Value)
+		if !ok {
+			cnew++
+		}
+	}
+	countInt, _ := mapGrowCount.Load("count")
+	count := countInt.(int)
+	count = count + cnew
+	mapGrowCount.Store("count", count)
 }
 
 func GetStatus(c *fiber.Ctx) error {

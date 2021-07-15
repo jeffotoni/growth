@@ -33,6 +33,20 @@ const Route = (RequestListener = (req, res) => {
   }
 });
 
+const routeKey = (req = http.IncomingMessage) => {
+  return req.url
+    .replace(/^\/api\/v1\/growth\//, "")
+    .replace(/\//g, "")
+    .toUpperCase();
+};
+
+
+const GetSize = RequestListener = (req, res) => {
+  const count = Object.keys(mapGrow).length;
+  res.writeHead(200, JSON.stringify({ count: count.toString() }));
+  res.end();
+};
+
 const RoutePost = (RequestListener = (req, res) => {
   let body = "";
   req.on("data", (chunk) => {
@@ -56,7 +70,7 @@ const RoutePost = (RequestListener = (req, res) => {
         object.Year;
       var value = object.Value;
       map.set(key, value);
-      console.log(key);
+     // console.log(key);
       i++;
     });
 
@@ -66,6 +80,22 @@ const RoutePost = (RequestListener = (req, res) => {
     res.end();
   });
 });
+
+const RouteGet = RequestListener = (req, res) => {
+  const key = routeKey(req);
+  //console.log(key)
+  const val = map.get(key);
+  if (!val) {
+    res.writeHead(400, JSON.stringify({ msg: "not found" }), {
+      "Content-Type": "application/json",
+    });
+    return res.end();
+  }
+
+  res.writeHead(200, JSON.stringify({Value: val}));
+  res.end();
+};
+
 const server = http.createServer(requestListener);
 console.log(
   "\x1b[36m%s\x1b[0m",

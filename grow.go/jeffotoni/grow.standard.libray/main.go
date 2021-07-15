@@ -16,6 +16,11 @@ var (
 	mapGrowCount sync.Map
 )
 
+// const numJobs = 50000
+// var jobs = make(chan dataGrowth, numJobs)
+
+//var results = make(chan int, numJobs)
+
 /* Example
 [
    {
@@ -251,22 +256,33 @@ func Post(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	go func(grow []dataGrowth) {
-		var cnew int = 0
-		for _, v := range grow {
-			year := strconv.Itoa(v.Year)
-			key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
-			_, ok := mapGrow.LoadOrStore(key, v.Value)
-			if !ok {
-				cnew++
-			}
-		}
-		countInt, _ := mapGrowCount.Load("count")
-		count := countInt.(int)
-		count = count + cnew
-		mapGrowCount.Store("count", count)
-	}(grow)
+	var numJobs = len(grow)
+	var jobs = make(chan dataGrowth, numJobs)
+	for w := 0; w < 50; w++ {
+		go worker(w, jobs)
+	}
+	for j := 0; j < numJobs; j++ {
+		jobs <- grow[j]
+	}
+	close(jobs)
+
 	WriteService(w, r, 202, `{"msg":"In progress"}`)
+}
+
+func worker(id int, grow <-chan dataGrowth) {
+	var cnew int = 0
+	for v := range grow {
+		year := strconv.Itoa(v.Year)
+		key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
+		_, ok := mapGrow.LoadOrStore(key, v.Value)
+		if !ok {
+			cnew++
+		}
+	}
+	countInt, _ := mapGrowCount.Load("count")
+	count := countInt.(int)
+	count = count + cnew
+	mapGrowCount.Store("count", count)
 }
 
 func WriteService(w http.ResponseWriter, r *http.Request, code int, msg string) {
