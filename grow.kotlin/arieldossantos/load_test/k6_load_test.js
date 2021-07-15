@@ -39,7 +39,6 @@ export default function () {
                            { headers }
                          );
     var resDelete = http.del('http://localhost:8080/api/v1/growth/brz/ngdp_r/2002');
-    var resDeleteNotFound = http.del('http://localhost:8080/api/v1/growth/brz/ariel/2');
 
 
     check(resGetStatus, {
@@ -52,11 +51,6 @@ export default function () {
 
     check(resDelete, {
         'delete entity is status 202': (r) => r.status === 202,
-    });
-
-
-    check(resDeleteNotFound, {
-        'delete not found entity is status 404': (r) => r.status === 404,
     });
 
     check(resPut, {
