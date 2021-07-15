@@ -16,7 +16,7 @@ class Create
         return $this->server['HTTP_CONTENT_TYPE'] ?? null;
     }
 
-    public function __invoke(array $arguments): void
+    public function __invoke(array $args): void
     {
         if ($this->getRequestContentType() !== 'application/json') {
             header('HTTP/1.1 415 Unsupported Media Type');
@@ -31,5 +31,9 @@ class Create
         }
 
         header('HTTP/1.1 201 Created');
+
+        $key = sprintf('%s-%s-%s', $args['country'], $args['indicator'], $args['year']);
+
+        apcu_store($key, $data);
     }
 }
