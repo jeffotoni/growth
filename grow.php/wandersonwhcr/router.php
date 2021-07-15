@@ -4,6 +4,10 @@ spl_autoload_register(function ($classname) {
     require sprintf('./src/%s.php', strtr($classname, '\\', '/'));
 });
 
+set_error_handler(function ($number, $message, $file, $line) {
+    throw new ErrorException($message, 0, $number, $file, $line);
+});
+
 $routes = [
     [
         'method' => 'POST',
