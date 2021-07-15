@@ -32,5 +32,3 @@ ENTRYPOINT ["/usr/local/bin/php"]
 CMD ["-S", "0.0.0.0:8080", "/app/router.php"]
 
 EXPOSE 8080
-
-VOLUME "/app/router.php"

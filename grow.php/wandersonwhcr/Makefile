@@ -16,5 +16,5 @@ base:
 dev: base
 	docker run --rm --interactive --tty \
 		--publish 8080:8080 \
-		--volume `pwd`/router.php:/app/router.php:ro \
+		--volume `pwd`:/app:ro \
 		wandersonwhcr/php:${PHP_VERSION}-cli
