@@ -1,7 +1,10 @@
 <?php
 
 spl_autoload_register(function ($classname) {
-    require sprintf('./src/%s.php', strtr($classname, '\\', '/'));
+    $filename = sprintf('./src/%s.php', strtr($classname, '\\', '/'));
+    if (is_readable($filename)) {
+        require $filename;
+    }
 });
 
 set_error_handler(function ($number, $message, $file, $line) {
