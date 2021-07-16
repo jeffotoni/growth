@@ -31,6 +31,14 @@ $ docker images | grep growth-kt
 growth-kt    latest      fdbf94696025   30 seconds ago   75.9MB
 ```
 
+## Load test
+
+Utilizei o k6 para teste de carga! Ele é muito simples de usar, e vc nao precisa instalar nada =]. Basta executar o comando abaixo na pasta load_test:
+
+```shell
+$  docker run --network="host" --rm -i loadimpact/k6 run - <k6_load_test.js
+```
+
 # Docs de uso da API
 
 O que iremos enviar para o [POST] será um json de 3Mb com mais de 40k de linhas e o corpo do Json está logo abaixo:

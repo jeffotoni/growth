@@ -21,6 +21,11 @@ fun Application.configureRouting() {
         get("/") {
             call.respondText("Kotlin rocks \uD83D\uDE0A!")
         }
+
+        get("/ping") {
+            call.respond(HttpStatusCode.OK, "pong")
+        }
+
         route("/api/v1/growth") {
             //Post on growth
             post() {
@@ -63,11 +68,11 @@ fun Application.configureRouting() {
                     country?.let {
                         indicator?.let {
                             year?.let {
+                                growthService.updateByCountryAndIndicatorAndYear(
+                                    country, indicator, year.toInt(), valueModel.value
+                                )
                                 call.respond(
-                                    HttpStatusCode.OK,
-                                    growthService.updateByCountryAndIndicatorAndYear(
-                                        country, indicator, year.toInt(), valueModel.value
-                                    )
+                                    HttpStatusCode.Accepted
                                 )
                             }
                         }
@@ -81,14 +86,11 @@ fun Application.configureRouting() {
                     country?.let {
                         indicator?.let {
                             year?.let {
-                                val deleted = growthService.deleteByCountryAndIndicatorAndYear(
+                                growthService.deleteByCountryAndIndicatorAndYear(
                                     country, indicator, year.toInt()
                                 )
                                 call.respond(
-                                    if (deleted)
-                                        HttpStatusCode.Accepted
-                                    else
-                                        HttpStatusCode.NotFound
+                                    HttpStatusCode.Accepted
                                 )
                             }
                         }

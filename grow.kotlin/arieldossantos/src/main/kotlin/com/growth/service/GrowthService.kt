@@ -3,14 +3,9 @@ package com.growth.service
 import com.growth.response.GrowthListCountResponse
 import com.growth.response.GrowthPostResponse
 import com.growth.response.GrowthSizeResponse
-import com.growth.response.GrowthValueResponse
 import com.growth.storage.GrowthEntity
-import io.ktor.util.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
+import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 
@@ -22,12 +17,10 @@ class GrowthService {
 
     fun insertValues(growthHashMapList: List<LinkedHashMap<String, Any>>): GrowthPostResponse {
         isProcessing.set(true) // define a variável is processing como true para verificaçao de status
-        GlobalScope.launch { // cria um escopo de coroutine, para execução async =]
-            growthHashMapList.forEach {
-                safeInsert(it) //insere dados de forma segura (para não quebrar o processamento)
-            }
-            isProcessing.set(false) // define a variável is processing como false para verificaçao de status
+        growthHashMapList.forEach {
+            safeInsert(it) //insere dados de forma segura (para não quebrar o processamento)
         }
+        isProcessing.set(false) // define a variável is processing como false para verificaçao de status
         return GrowthPostResponse("In progress")
     }
 
@@ -46,18 +39,19 @@ class GrowthService {
         )
     }
 
-    fun findByCountryAndIndicatorAndYear(country: String, indicator: String, year: Int): GrowthEntity? {
-        return GrowthEntity.growthStorage.firstOrNull {
-            (it.Country.uppercase() == country.uppercase())
-                .and(it.Indicator.uppercase() == indicator.uppercase())
-                .and(it.Year == year)
-        }
+    @Synchronized fun findByCountryAndIndicatorAndYear(country: String, indicator: String, year: Int): GrowthEntity? {
+        return GrowthEntity.growthStorage.filter {
+            (it.value.Country.uppercase() == country.uppercase())
+                .and(it.value.Indicator.uppercase() == indicator.uppercase())
+                .and(it.value.Year == year)
+        }.values.firstOrNull()
     }
 
-    fun deleteByCountryAndIndicatorAndYear(country: String, indicator: String, year: Int): Boolean {
-        val element = findByCountryAndIndicatorAndYear(country, indicator, year)
-        if (element != null) {
-            return GrowthEntity.growthStorage.remove(element)
+    @Synchronized fun deleteByCountryAndIndicatorAndYear(country: String, indicator: String, year: Int): Boolean {
+        val key = getKeyByCountryAndIndicatorAndYear(country, indicator, year) ?: UUID.randomUUID()
+        if (key != null) {
+            val element = GrowthEntity.growthStorage[key]
+            return GrowthEntity.growthStorage.remove(key, element)
         }
         return false
     }
@@ -65,20 +59,22 @@ class GrowthService {
     fun updateByCountryAndIndicatorAndYear(
         country: String, indicator: String, year: Int, value: Double
     ) {
-        val currentElement = findByCountryAndIndicatorAndYear(country, indicator, year)
-        if (currentElement != null) {
-            val elementIndex = GrowthEntity.growthStorage.indexOf(currentElement)
-            GrowthEntity.growthStorage[elementIndex] = currentElement.copy(Value = value)
-        } else {
-            GrowthEntity.growthStorage.add(
-                GrowthEntity(
-                    country,
-                    indicator,
-                    value,
-                    year
-                )
-            )
-        }
+        val currentKey = getKeyByCountryAndIndicatorAndYear(country, indicator, year) ?: UUID.randomUUID()
+
+        GrowthEntity.growthStorage[currentKey] = GrowthEntity(
+            country,
+            indicator,
+            value,
+            year
+        )
+    }
+
+    private fun getKeyByCountryAndIndicatorAndYear(
+        country: String, indicator: String, year: Int
+    ): UUID? {
+        return GrowthEntity.growthStorage.filterValues {
+            it.Country == country && it.Indicator == indicator && it.Year == year
+        }.keys.firstOrNull()
     }
 
     private fun getCountMessageAsString(value: Boolean): String {
@@ -86,11 +82,15 @@ class GrowthService {
     }
 
     private fun getTestValue(): Double? {
-        return GrowthEntity.growthStorage.elementAtOrNull(0)?.Value
+        val treeMap = TreeMap(GrowthEntity.growthStorage)
+        return if(treeMap.isNotEmpty()) treeMap.firstEntry().value.Value else null
     }
 
     private fun getCountValue(): Int {
-        return GrowthEntity.growthStorage.size
+        return if(GrowthEntity.growthStorage.isNotEmpty())
+            GrowthEntity.growthStorage.size
+        else
+            0
     }
 
     private fun safeInsert(growthHashMap: LinkedHashMap<String, Any>) {
@@ -101,7 +101,7 @@ class GrowthService {
                 growthHashMap["Value"].toString().toDouble(),
                 growthHashMap["Year"].toString().toInt()
             )
-            GrowthEntity.growthStorage.add(currentGrowthEntity)
+            GrowthEntity.growthStorage[UUID.randomUUID()] = currentGrowthEntity
         } catch (ex: Exception) {
             logger.error("Error on insert current item: $growthHashMap", ex)
         }
