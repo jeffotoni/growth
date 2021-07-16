@@ -1,12 +1,7 @@
 import http from 'k6/http';
-import { SharedArray } from "k6/data";
 import { sleep } from 'k6';
 
-var payload = new SharedArray("growth", function () {
-  var f = JSON.parse(open("./data/growth.json"));
-  //console.log(JSON.stringify(f));
-  return f;
-});
+const headers = { 'Content-Type': 'application/json' };
 
 export let options = {
   vus: 10,
@@ -15,17 +10,12 @@ export let options = {
 
 export default function () {
   var url = `${__ENV.DOMAIN}/api/v1/growth`;
-  var params = {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  };
 
-  http.post(url,  JSON.stringify(payload), params);
+  http.get(`${__ENV.DOMAIN}/ping`,{ headers: headers });
   sleep(1);
-  http.get(`${__ENV.DOMAIN}/ping`);
+	http.get(`${__ENV.DOMAIN}/api/v1/growth/brz/ngdp_r/2002`,{ headers: headers });
   sleep(1);
-	http.get(`${__ENV.DOMAIN}/api/v1/growth/brz/ngdp_r/2002`);
-
+  const data = { value: 345.88 };
+  http.put(`${__ENV.DOMAIN}/api/v1/growth/brz/ngdp_r/2002`,JSON.stringify(data), { headers: headers } );
 }
 

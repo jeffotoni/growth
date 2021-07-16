@@ -128,6 +128,7 @@ func Put(w http.ResponseWriter, r *http.Request) {
 	var code int = 400
 	elem := strings.Split(r.URL.Path, "/")
 	if len(elem) != 7 {
+		println("get in....", len(elem))
 		WriteService(w, r, code, `{"msg":"error in path"}`)
 		return
 	}
