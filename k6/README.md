@@ -29,7 +29,7 @@ Vamos mostrar a instalação usando Docker desta forma não irá precisar instal
 $ docker pull loadimpact/k6
 ```
 
-Agora vamos executar nossa massa de testes.
+Agora vamos executar nossa massa de testes. O detalhe abaixo é que como está em container a rede que irá executar é outra, então passei parametro para nosso Script para buscar nosso domain ou hosname da api e o volume para carregar nosso json.
 ```bash
 $ docker run -v $(pwd):/data \
 -e DOMAIN=http://192.168.0.70:8080 \
