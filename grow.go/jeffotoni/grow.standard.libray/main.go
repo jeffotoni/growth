@@ -255,18 +255,15 @@ func Post(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"msg":"error in your json"}`))
 		return
 	}
-	defer r.Body.Close()
-
 	var numJobs = len(grow)
 	var jobs = make(chan dataGrowth, numJobs)
-	for w := 0; w < 500; w++ {
+	for w := 0; w < 400; w++ {
 		go worker(w, jobs)
 	}
-	for j := 0; j < numJobs; j++ {
+	for j := 0; j < len(grow); j++ {
 		jobs <- grow[j]
 	}
 	close(jobs)
-
 	WriteService(w, r, 202, `{"msg":"In progress"}`)
 }
 
@@ -275,7 +272,6 @@ func worker(id int, grow <-chan dataGrowth) {
 	for v := range grow {
 		year := strconv.Itoa(v.Year)
 		key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
-		fmt.Sprintf("%s", key)
 		_, ok := mapGrow.LoadOrStore(key, v.Value)
 		if !ok {
 			cnew++
