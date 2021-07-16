@@ -83,9 +83,6 @@ func Post(c *fiber.Ctx) error {
 	for _, tgrow := range grow {
 		jobs <- tgrow
 	}
-	// for j := 0; j < numJobs; j++ {
-	// 	jobs <- grow[j]
-	// }
 	close(jobs)
 	return c.Status(202).SendString(`{"msg":"In progress"}`)
 }
