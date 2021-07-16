@@ -8,7 +8,6 @@ import (
 	"sync"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 var (
@@ -42,12 +41,12 @@ type dataGrowth struct {
 
 func init() {
 	mapGrowCount.Store("count", 0)
-	mapGrow.Store(("BRZNGDPX_R2002", "183.26")
+	mapGrow.Store("BRZNGDPX_R2002", "183.26")
 }
 
 func main() {
 	app := fiber.New(fiber.Config{BodyLimit: 10 * 1024 * 1024})
-	app.Use(cors.New())
+	//app.Use(cors.New())
 	// app.Use(logger.New(logger.Config{
 	// 	Format:     "${pid} ${time} ${method} ${path} - ${ip} - \u001B[0;34m${status}\u001B[0m - \033[1;32m${latency}\033[0m\n",
 	// 	TimeFormat: "02-Jan-2006 15:04:05",
