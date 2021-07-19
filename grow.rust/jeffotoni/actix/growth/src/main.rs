@@ -48,7 +48,7 @@ async fn index_manual(mut payload: web::Payload) -> Result<HttpResponse, Error> 
 }
 
 /// This handler manually load request payload and parse json-rust
-async fn index_mjsonrust(body: web::Bytes) -> Result<HttpResponse, Error> {
+async fn post(body: web::Bytes) -> Result<HttpResponse, Error> {
     // body is loaded, now we can deserialize json-rust
     let result = json::parse(std::str::from_utf8(&body).unwrap()); // return Result
     let injson: JsonValue = match result {
@@ -57,7 +57,8 @@ async fn index_mjsonrust(body: web::Bytes) -> Result<HttpResponse, Error> {
     };
     Ok(HttpResponse::Ok()
         .content_type("application/json")
-        .body(injson.dump()))
+        //.body(injson.dump()))
+        .body("{\"msg\":\"in progress\"}"))
 }
 
 #[actix_web::main]
@@ -70,17 +71,16 @@ async fn main() -> std::io::Result<()> {
             // enable logger
             .wrap(middleware::Logger::default())
             .data(web::JsonConfig::default().limit(10485760)) // <- limit size of the payload (global configuration)
+            .app_data(web::PayloadConfig::new(10485760))
             .service(web::resource("/extractor").route(web::post().to(index)))
             .service(
                 web::resource("/extractor2")
-                    .data(web::JsonConfig::default().limit(10485760)) // <- limit size of the payload (resource level)
                     .route(web::post().to(extract_item)),
             )
             .service(web::resource("/manual").route(web::post().to(index_manual)))
             .service(
-                web::resource("/mjsonrust")
-                    .data(web::JsonConfig::default().limit(10485760_144))
-                    .route(web::post().to(index_mjsonrust))
+                web::resource("/api/v1/growth")
+                    .route(web::post().to(post))
                 )
             .service(
                 web::resource("/")
