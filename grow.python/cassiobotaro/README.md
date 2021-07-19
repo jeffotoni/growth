@@ -33,7 +33,7 @@ Depois de fazer build do projeto vamos conferir sua dimensão
 
 ```bash
 $ docker images | grep apigrow-python
-apigrow-python  latest  04f5f3493a6d  10 minutes ago   170MB
+apigrow-python  latest  04f5f3493a6d  10 minutes ago   116MB
 ```
 Prontinho, agora vamos executar e testar nossa apigrow ❤️
 
@@ -52,7 +52,7 @@ localhost:8080/api/v1/growth -d @3mb-growth_json.json
 {"msg":"In progress"}
 ```
 
-#### GET 
+#### GET
 Com este endpoint conseguimos visualizar o status de como está o processamento que enviamos no [POST]
 ```bash
 $ curl -i -XGET -H "Content-Type:application/json" \
@@ -85,7 +85,7 @@ localhost:8080/api/v1/growth/brz/ngdp_r/2002
 Este endpoint irá remove o dado de nossa base de dados memória.
 ```bash
 $ curl -i -XDELETE -H "Content-Type:application/json" \
-localhost:8080/api/v1/growth/brz/ngdp_r/2002 
+localhost:8080/api/v1/growth/brz/ngdp_r/2002
 ```
 #### GET
 Este endpoint irá retornar o tamanho que encontra-se a nossa base de dados na memória
