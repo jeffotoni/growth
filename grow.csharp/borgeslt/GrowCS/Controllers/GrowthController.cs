@@ -33,6 +33,7 @@ namespace GrowCS.Controllers
             var file  = jsonFile.File;
             if (file == null || file.Length == 0)
             {
+                
                 return BadRequest(new {msg = "error in your json" });
             }
 
@@ -47,7 +48,7 @@ namespace GrowCS.Controllers
         }
 
         [HttpGet]
-        [Route("status")]
+        [Route("post/status")]
         public async Task<ActionResult> Status()
         {
             var result = await _context.GrowData.FirstOrDefaultAsync(d => d.Country == "BRZ" && d.Indicator == "NGDP_R" && d.Year == 2002);
@@ -68,7 +69,7 @@ namespace GrowCS.Controllers
         [Route("country/indicator/year")]
         public async Task<ActionResult> Get(string country, string indicator, int year)
         {
-            var result = await _context.GrowData.FirstOrDefaultAsync(d => d.Country == country && d.Indicator == indicator && d.Year == year);
+            var result = await _context.GrowData.FirstOrDefaultAsync(d => d.Country == country.ToUpper() && d.Indicator == indicator.ToUpper() && d.Year == year);
             if (result == null)
             {
                 return BadRequest(new { msg = "error in path url" });
@@ -93,7 +94,7 @@ namespace GrowCS.Controllers
 
         [HttpPut]
         [Route("country/indicator/year")]
-        public async Task<ActionResult> Put(string country, string indicator, int year, [FromBody] int value)
+        public async Task<ActionResult> Put(string country, string indicator, int year, [FromBody] float value)
         {
             var action = "Updated";
             var result = await _context.GrowData.FirstOrDefaultAsync(d => d.Country == country && d.Indicator == indicator && d.Year == year);
