@@ -1,12 +1,8 @@
 import asyncio
-from json import loads
 import time
-from uuid import uuid4
-from pathlib import Path
 
-from fastapi import BackgroundTasks, Body, FastAPI, Request, status
+from fastapi import BackgroundTasks, FastAPI, Request, status
 from fastapi.exceptions import HTTPException
-from fastapi.responses import ORJSONResponse
 from fastapi.routing import APIRouter
 from pydantic import BaseModel
 
@@ -54,7 +50,7 @@ async def store(data: DataGrowth):
         map_grow[key] = data.value
 
 
-app = FastAPI(default_response_class=ORJSONResponse)
+app = FastAPI()
 api_router = APIRouter(prefix="/api/v1")
 growth_router = APIRouter(prefix="/growth", tags=["growth"])
 
