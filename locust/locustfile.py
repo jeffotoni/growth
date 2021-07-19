@@ -3,9 +3,6 @@ from locust import HttpUser, task, between
 import json
 default_headers = {'Content-Type': 'application/json', 'Cache-Control': "no-cache",
                    'User-Agent': 'locust', "Authorization": "Bearer abc8383xx"}
-f = open('../3mb-growth_json.json',)
-new_post = json.load(f)
-
 
 class QuickstartUser(HttpUser):
     @task
