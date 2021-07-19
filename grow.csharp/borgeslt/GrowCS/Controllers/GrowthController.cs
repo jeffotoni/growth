@@ -35,8 +35,14 @@ namespace GrowCS.Controllers
         {   
             if (item == null) return BadRequest();
             Console.WriteLine(":...debug in Json...:");
-            string str2 = item.ToString();
-            var data = JsonSerializer.Deserialize<GrowData[]>(str2);
+
+            var result = await _context.GrowData.CountAsync();
+            if (result > 0) {
+                return Ok(new { msg = "In progress" });
+            }
+
+            string sjson = item.ToString();
+            var data = JsonSerializer.Deserialize<GrowData[]>(sjson);
             _context.GrowData.AddRange(data);
             await _context.SaveChangesAsync();
             return Ok(new { msg = "In progress" });
@@ -65,6 +71,7 @@ namespace GrowCS.Controllers
 
         [HttpGet]
         [Route("post/status")]
+        [Produces("application/json")]
         public async Task<ActionResult> Status()
         {
             var result = await _context.GrowData.FirstOrDefaultAsync(d => d.Country == "BRZ" && d.Indicator == "NGDP_R" && d.Year == 2002);
@@ -82,10 +89,11 @@ namespace GrowCS.Controllers
         }
 
         [HttpGet]
-        [Route("country/indicator/year")]
+        [Route("{country}/{indicator}/{year}")]
+        [Produces("application/json")]
         public async Task<ActionResult> Get(string country, string indicator, int year)
         {
-            //Response.Write("entrei country:" + country);
+           Console.WriteLine(":...debug in Json...:" + country);
             var result = await _context.GrowData.FirstOrDefaultAsync(d => d.Country == country.ToUpper()
             && d.Indicator == indicator.ToUpper() && d.Year == year);
             if (result == null)
@@ -104,6 +112,7 @@ namespace GrowCS.Controllers
 
         [HttpGet]
         [Route("size")]
+        [Produces("application/json")]
         public async Task<ActionResult> GetSize()
         {
             var result = await _context.GrowData.CountAsync();
@@ -111,25 +120,35 @@ namespace GrowCS.Controllers
         }
 
         [HttpPut]
-        [Route("country/indicator/year")]
-        public async Task<ActionResult> Put(string country, string indicator, int year, [FromBody] float value)
-        {
+        [Route("{country}/{indicator}/{year}")]
+        [Produces("application/json")]        
+        public async Task<ActionResult> Put(string country, string indicator, int year, [FromBody] Object item)
+        {   
             var action = "Updated";
-            var result = await _context.GrowData.FirstOrDefaultAsync(d => d.Country == country && d.Indicator == indicator && d.Year == year);
+            var result = await _context.GrowData.FirstOrDefaultAsync(d => d.Country == country.ToUpper() 
+            && d.Indicator == indicator.ToUpper() && d.Year == year);
+
+            string sjson = item.ToString();
+            var data = JsonSerializer.Deserialize<GrowData>(sjson);
+
             if (result == null)
             {
+                if (item == null) return BadRequest();
+               
+                Console.WriteLine(":...debug in item Json...:"+data.Value);
+
                 _context.GrowData.Add(new GrowData
                 {
-                    Country = country,
-                    Indicator = indicator,
+                    Country = country.ToUpper(),
+                    Indicator = indicator.ToUpper(),
                     Year = year,
-                    Value = value
+                    Value = data.Value
                 });
                 action = "Inserted";
             }
             else
             {
-                result.Value = value;
+                result.Value = data.Value;
                 _context.Update(result);
             }
 
@@ -142,10 +161,11 @@ namespace GrowCS.Controllers
         }
 
         [HttpDelete]
-        [Route("country/indicator/year")]
+        [Route("{country}/{indicator}/{year}")]
+        [Produces("application/json")]
         public async Task<ActionResult> Delete(string country, string indicator, int year)
         {
-            var result = await _context.GrowData.FirstOrDefaultAsync(d => d.Country == country && d.Indicator == indicator && d.Year == year);
+            var result = await _context.GrowData.FirstOrDefaultAsync(d => d.Country == country.ToUpper() && d.Indicator == indicator.ToUpper() && d.Year == year);
             if (result == null)
             {
                 return BadRequest(new { msg = "error in path url" });
