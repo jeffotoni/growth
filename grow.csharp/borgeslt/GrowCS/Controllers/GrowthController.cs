@@ -1,3 +1,5 @@
+using System;
+using System.Text;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -28,13 +30,27 @@ namespace GrowCS.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromForm] JsonFile jsonFile)
+        [Produces("application/json")]
+        public async Task<ActionResult> Post([FromBody] Object item)
+        {   
+            if (item == null) return BadRequest();
+            Console.WriteLine(":...debug in Json...:");
+            string str2 = item.ToString();
+            var data = JsonSerializer.Deserialize<GrowData[]>(str2);
+            _context.GrowData.AddRange(data);
+            await _context.SaveChangesAsync();
+            return Ok(new { msg = "In progress" });
+        }
+
+        [HttpPost]
+        [Route("/form")]
+        public async Task<ActionResult> PostForm([FromForm] JsonFile jsonFile)
         {
-            var file  = jsonFile.File;
+            var file = jsonFile.File;
             if (file == null || file.Length == 0)
             {
-                
-                return BadRequest(new {msg = "error in your json" });
+
+                return BadRequest(new { msg = "error in your json" });
             }
 
             using var reader = new StreamReader(file.OpenReadStream());
@@ -69,7 +85,9 @@ namespace GrowCS.Controllers
         [Route("country/indicator/year")]
         public async Task<ActionResult> Get(string country, string indicator, int year)
         {
-            var result = await _context.GrowData.FirstOrDefaultAsync(d => d.Country == country.ToUpper() && d.Indicator == indicator.ToUpper() && d.Year == year);
+            //Response.Write("entrei country:" + country);
+            var result = await _context.GrowData.FirstOrDefaultAsync(d => d.Country == country.ToUpper()
+            && d.Indicator == indicator.ToUpper() && d.Year == year);
             if (result == null)
             {
                 return BadRequest(new { msg = "error in path url" });
