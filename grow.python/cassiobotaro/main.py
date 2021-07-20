@@ -1,7 +1,8 @@
 import asyncio
+import json
 import time
 
-from fastapi import BackgroundTasks, FastAPI, Request, status
+from fastapi import FastAPI, Request, status
 from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
 from pydantic import BaseModel
@@ -49,6 +50,9 @@ async def store(data: DataGrowth):
     async with grow_lock:
         map_grow[key] = data.value
 
+async def parse_and_store(body):
+    await batch_store([DataGrowth(**grow) for grow in json.loads(body)])
+
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api/v1")
@@ -70,8 +74,8 @@ async def ping():
 
 
 @growth_router.post("/", status_code=status.HTTP_202_ACCEPTED)
-async def post(background_tasks: BackgroundTasks, grow: list[DataGrowth]):
-    background_tasks.add_task(batch_store, grow)
+async def post(req: Request):
+    await parse_and_store(await req.body())
     return {"msg": "In progress"}
 
 
