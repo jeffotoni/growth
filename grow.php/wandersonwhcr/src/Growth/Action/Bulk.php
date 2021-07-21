@@ -39,8 +39,11 @@ class Bulk
         foreach ($dataset as $data) {
             $key = strtolower(sprintf('growth-%s-%s-%s', $data->Country, $data->Indicator, $data->Year));
 
+            if (! apcu_exists($key)) {
+                apcu_inc('growth-count');
+            }
+
             apcu_store($key, $data);
-            apcu_inc('growth-count');
         }
 
         header('HTTP/1.1 201 Accepted');
