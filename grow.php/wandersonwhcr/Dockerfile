@@ -10,6 +10,8 @@ FROM scratch
 COPY --from=base /usr/local/bin/php /usr/local/bin/php
 COPY --from=base /lib/ld-musl-x86_64.so.1 /lib/ld-musl-x86_64.so.1
 
+COPY ./php.ini /usr/local/lib/php.ini
+
 COPY ./router.php /app/router.php
 COPY ./src /app/src
 
@@ -20,3 +22,5 @@ ENTRYPOINT ["/usr/local/bin/php"]
 CMD ["-S", "0.0.0.0:8080", "router.php"]
 
 EXPOSE 8080
+
+VOLUME "/tmp"
