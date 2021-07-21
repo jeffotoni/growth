@@ -21,6 +21,15 @@ docker inspect \
     | numfmt --to iec --format '%.2f'
 ```
 
+## Execução
+
+```
+docker run --rm \
+    --detach \
+    --publish 8080:8080 \
+    wandersonwhcr/growth:latest
+```
+
 ### Considerações
 
 * Durante a criação da imagem, efetua-se o _download_ do código-fonte do PHP,
