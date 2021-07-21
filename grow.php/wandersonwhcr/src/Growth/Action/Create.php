@@ -2,6 +2,8 @@
 
 namespace Growth\Action;
 
+use StdClass;
+
 class Create
 {
     protected array $server;
@@ -23,9 +25,9 @@ class Create
             return;
         }
 
-        $data = json_decode(file_get_contents('php://input'));
+        $content = json_decode(file_get_contents('php://input'));
 
-        if (! $data) {
+        if (! $content) {
             header('HTTP/1.1 422 Unprocessable Entity');
             return;
         }
@@ -33,6 +35,12 @@ class Create
         header('HTTP/1.1 201 Created');
 
         $key = sprintf('growth-%s-%s-%s', $args['country'], $args['indicator'], $args['year']);
+
+        $data = new StdClass();
+        $data->Country = strtoupper($args['country']);
+        $data->Indicator = strtoupper($args['indicator']);
+        $data->Value = $content->value;
+        $data->Year = strtoupper($args['year']);
 
         apcu_store($key, $data);
         apcu_inc('growth-count');
