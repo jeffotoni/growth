@@ -1,34 +1,26 @@
-FROM alpine:3.14 AS builder
+ARG DOCKER_IMAGE_TAG
 
-RUN mkdir -p /usr/src \
-    && cd /usr/src \
-    && wget -q https://github.com/php/php-src/archive/refs/tags/php-8.0.8.tar.gz \
-    && tar -xzf php-8.0.8.tar.gz \
-    && mv php-src-php-8.0.8 php
-
-WORKDIR /usr/src/php
-
-RUN apk add alpine-sdk autoconf automake libtool \
-    && apk add bison re2c \
-    && ./buildconf --force
-
-RUN ./configure --disable-all --disable-cgi --disable-phpdbg --disable-debug CFLAGS="-O3 -march=native"
-
-RUN make \
-    && make install
+FROM ${DOCKER_IMAGE_TAG} AS base
 
 RUN apk add upx \
     && upx -9 /usr/local/bin/php
 
 FROM scratch
 
-COPY --from=builder /usr/local/bin/php /usr/local/bin/php
-COPY --from=builder /lib/ld-musl-x86_64.so.1 /lib/ld-musl-x86_64.so.1
+COPY --from=base /usr/local/bin/php /usr/local/bin/php
+COPY --from=base /lib/ld-musl-x86_64.so.1 /lib/ld-musl-x86_64.so.1
+
+COPY ./php.ini /usr/local/lib/php.ini
 
 COPY ./router.php /app/router.php
+COPY ./src /app/src
+
+WORKDIR "/app"
 
 ENTRYPOINT ["/usr/local/bin/php"]
 
-CMD ["-S", "0.0.0.0:8000", "/app/router.php"]
+CMD ["-S", "0.0.0.0:8080", "router.php"]
 
-EXPOSE 8000
+EXPOSE 8080
+
+VOLUME "/tmp"
