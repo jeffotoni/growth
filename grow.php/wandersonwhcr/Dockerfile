@@ -9,9 +9,7 @@ FROM scratch
 
 COPY --from=base /usr/local/bin/php /usr/local/bin/php
 
-COPY ./php.ini /usr/local/lib/php.ini
-
-COPY ./router.php /app/router.php
+COPY ./server.php /app/server.php
 COPY ./src /app/src
 
 WORKDIR "/app"
@@ -21,5 +19,3 @@ ENTRYPOINT ["/usr/local/bin/php"]
 CMD ["server.php"]
 
 EXPOSE 8080
-
-VOLUME "/tmp"
