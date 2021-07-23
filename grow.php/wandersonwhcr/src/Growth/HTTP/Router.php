@@ -29,7 +29,7 @@ class Router
         foreach ($this->routes as $route) {
             if ('*' === $route['method'] || $request->getMethod() === $route['method']) {
                 if (preg_match(sprintf('#%s#', $route['uri']), $request->server['request_uri'], $matches) === 1) {
-                    return function (Request $request, Response $response) use ($matches) {
+                    return function (Request $request, Response $response) use ($route, $matches) {
                         ($route['action'])($request, $response, $matches);
                     };
                 }

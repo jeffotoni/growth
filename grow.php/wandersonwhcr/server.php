@@ -29,6 +29,10 @@ $router->map('DELETE', '^/api/v1/growth/(?<country>[^/]+)/(?<indicator>[^/]+)/(?
 
 $server = new Server('0.0.0.0', 8080);
 
+$server->set([
+    'package_max_length' => 10 * 1024 * 1024, // 10MB
+]);
+
 $server->on('Start', function (Server $server) {
     echo sprintf("[%s] Server started at http://0.0.0.0:8080/\n", date('r'));
     Process::signal(SIGINT, fn() => $server->stop());
