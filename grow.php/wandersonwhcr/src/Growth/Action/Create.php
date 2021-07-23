@@ -2,32 +2,37 @@
 
 namespace Growth\Action;
 
+use Swoole\HTTP\Request;
+use Swoole\HTTP\Response;
+use Swoole\Table;
 use StdClass;
 
 class Create
 {
-    protected array $server;
-
-    protected function getRequestContentType(): ?string
+    public function __construct(private Table $table)
     {
-        return $this->server['HTTP_CONTENT_TYPE'] ?? null;
     }
 
-    public function __invoke(array $args): void
+    protected function getRequestContentType(Request $request): ?string
     {
-        if ($this->getRequestContentType() !== 'application/json') {
-            header('HTTP/1.1 415 Unsupported Media Type');
+        return $request->header['content-type'] ?? null;
+    }
+
+    public function __invoke(Request $request, Response $response, array $args): void
+    {
+        if ($this->getRequestContentType($request) !== 'application/json') {
+            $response->status(415);
+            $response->end();
             return;
         }
 
-        $content = json_decode(file_get_contents('php://input'));
+        $content = json_decode($request->getContent());
 
         if (! $content) {
-            header('HTTP/1.1 422 Unprocessable Entity');
+            $response->status(422);
+            $response->end();
             return;
         }
-
-        header('HTTP/1.1 201 Created');
 
         $key = sprintf('growth-%s-%s-%s', $args['country'], $args['indicator'], $args['year']);
 
@@ -37,7 +42,9 @@ class Create
         $data->Value = $content->value;
         $data->Year = strtoupper($args['year']);
 
-        apcu_store($key, $data);
-        apcu_inc('growth-count');
+        $this->table->set($key, ['content' => json_encode($data)]);
+
+        $response->status(204);
+        $response->end();
     }
 }
