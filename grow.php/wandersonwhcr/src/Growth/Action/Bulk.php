@@ -4,9 +4,14 @@ namespace Growth\Action;
 
 use Swoole\HTTP\Request;
 use Swoole\HTTP\Response;
+use Swoole\Table;
 
 class Bulk
 {
+    public function __construct(private Table $table)
+    {
+    }
+
     private function getRequestContentType(Request $request): ?string
     {
         return $request->header['content-type'] ?? null;
@@ -38,14 +43,12 @@ class Bulk
         foreach ($dataset as $data) {
             $key = strtolower(sprintf('growth-%s-%s-%s', $data->Country, $data->Indicator, $data->Year));
 
-            if (! apcu_exists($key)) {
-                apcu_inc('growth-count');
-            }
-
-            apcu_store($key, $data);
+            $this->table->set($key, ['content' => json_encode($data)]);
         }
 
         $response->status(201);
-        $response->end('{"msg":"In progress"}');
+        $response->end(json_encode([
+            'msg' => 'In progress',
+        ]));
     }
 }

@@ -6,6 +6,7 @@ use Swoole\HTTP\Request;
 use Swoole\HTTP\Response;
 use Swoole\HTTP\Server;
 use Swoole\Process;
+use Swoole\Table;
 
 spl_autoload_register(function ($classname) {
     $filename = sprintf('./src/%s.php', strtr($classname, '\\', '/'));
@@ -18,10 +19,14 @@ set_error_handler(function ($number, $message, $file, $line) {
     throw new ErrorException($message, 0, $number, $file, $line);
 });
 
+$table = new Table(65536);
+$table->column('content', Swoole\Table::TYPE_STRING, 128);
+$table->create();
+
 $router = new Router();
 
-$router->map('POST', '^/api/v1/growth$', new Action\Bulk());
-$router->map('GET', '^/api/v1/growth/post/status$', new Action\Status());
+$router->map('POST', '^/api/v1/growth$', new Action\Bulk($table));
+$router->map('GET', '^/api/v1/growth/post/status$', new Action\Status($table));
 $router->map('GET', '^/api/v1/growth/size$', new Action\Size());
 $router->map('GET', '^/api/v1/growth/(?<country>[^/]+)/(?<indicator>[^/]+)/(?<year>[0-9]+)$', new Action\Find());
 $router->map('PUT', '^/api/v1/growth/(?<country>[^/]+)/(?<indicator>[^/]+)/(?<year>[0-9]+)$', new Action\Create());

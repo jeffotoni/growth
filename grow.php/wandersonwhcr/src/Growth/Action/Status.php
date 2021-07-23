@@ -2,18 +2,21 @@
 
 namespace Growth\Action;
 
+use Swoole\HTTP\Request;
+use Swoole\HTTP\Response;
+use Swoole\Table;
+
 class Status
 {
-    public function __invoke(): void
+    public function __construct(private Table $table)
     {
-        $count = 0;
-        if (apcu_exists('growth-count')) {
-            $count = apcu_fetch('growth-count');
-        }
+    }
 
-        file_put_contents('php://output', json_encode([
+    public function __invoke(Request $request, Response $response): void
+    {
+        $response->end(json_encode([
             'msg' => 'complete', // TODO Async
-            'count' => $count,
+            'count' => $this->table->count(),
         ]));
     }
 }
