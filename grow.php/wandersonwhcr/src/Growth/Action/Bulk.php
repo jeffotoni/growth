@@ -6,11 +6,6 @@ class Bulk
 {
     protected array $server;
 
-    public function __construct(array $server)
-    {
-        $this->server = $server;
-    }
-
     protected function getRequestContentType(): ?string
     {
         return $this->server['HTTP_CONTENT_TYPE'] ?? null;

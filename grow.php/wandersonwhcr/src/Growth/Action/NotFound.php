@@ -2,10 +2,14 @@
 
 namespace Growth\Action;
 
+use Swoole\HTTP\Request;
+use Swoole\HTTP\Response;
+
 class NotFound
 {
-    public function __invoke(): void
+    public function __invoke(Request $request, Response $response): void
     {
-        header('HTTP/1.1 404 Not Found');
+        $response->status(404);
+        $response->end();
     }
 }
