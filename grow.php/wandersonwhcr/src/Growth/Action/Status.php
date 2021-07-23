@@ -14,6 +14,7 @@ class Status
 
     public function __invoke(Request $request, Response $response): void
     {
+        $response->header('content-type', 'application/json');
         $response->end(json_encode([
             'msg' => 'complete', // TODO Async
             'count' => $this->table->count(),

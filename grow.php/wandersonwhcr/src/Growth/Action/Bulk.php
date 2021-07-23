@@ -47,6 +47,7 @@ class Bulk
         }
 
         $response->status(201);
+        $response->header('content-type', 'application/json');
         $response->end(json_encode([
             'msg' => 'In progress',
         ]));

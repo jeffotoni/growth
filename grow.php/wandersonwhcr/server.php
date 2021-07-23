@@ -27,7 +27,7 @@ $router = new Router();
 
 $router->map('POST', '^/api/v1/growth$', new Action\Bulk($table));
 $router->map('GET', '^/api/v1/growth/post/status$', new Action\Status($table));
-$router->map('GET', '^/api/v1/growth/size$', new Action\Size());
+$router->map('GET', '^/api/v1/growth/size$', new Action\Size($table));
 $router->map('GET', '^/api/v1/growth/(?<country>[^/]+)/(?<indicator>[^/]+)/(?<year>[0-9]+)$', new Action\Find());
 $router->map('PUT', '^/api/v1/growth/(?<country>[^/]+)/(?<indicator>[^/]+)/(?<year>[0-9]+)$', new Action\Create());
 $router->map('DELETE', '^/api/v1/growth/(?<country>[^/]+)/(?<indicator>[^/]+)/(?<year>[0-9]+)$', new Action\Remove());
