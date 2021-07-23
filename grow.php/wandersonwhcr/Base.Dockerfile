@@ -43,6 +43,6 @@ WORKDIR "/app"
 
 ENTRYPOINT ["/usr/local/bin/php"]
 
-CMD ["-S", "0.0.0.0:8080", "router.php"]
+CMD ["server.php"]
 
 EXPOSE 8080
