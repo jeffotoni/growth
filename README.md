@@ -5,14 +5,12 @@ Este repositório foi criado para disponibilizarmos projetos em diversas linguag
 As linguagens de programação ❤️ são ferramentas e devem ser utilizadas para resolver problemas específicos do que foram propostas a solucionar. Mas sabemos que é muito além disto 😍, nesta equação temos que adicionar uma pitada de AMOR😍 e quando tem esta combinação as coisas começam a ficarem ainda mais interessantes 😂😂.
 
 ---
-O escopo do projeto é criar uma API rEST um CRUD e persistir em memória e colocar em uma imagem docker e 
-o tamanho desta imagem docker não poderia ultrapassar 6Mb porém sabemos das limitações que cada linguagem possui e neste quesito você poderá enviar uma imagem maior, tente fazer o menor que conseguir bem enxuta ☺️.
+O escopo do projeto é criar uma API rEST um CRUD e persistir em memória e colocar em uma imagem docker e o tamanho desta imagem docker não poderia ultrapassar 6Mb porém sabemos das limitações que cada linguagem possui e neste quesito você poderá enviar uma imagem maior, tente fazer o menor que conseguir bem enxuta ☺️.
 
 O seu POST irá receber um JSON de 1mb ou 3mb e persistir em memória.
 Logo abaixo tem o exemplo e a descrição do que irá precisar implementar na API.
 
-Todo repo foi organizado por linguagens de programação, fique a vontade em colaborar enviando um
-pull request para nós, logo abaixo vamos deixar na documentação como fazer PR.
+Todo repo foi organizado por linguagens de programação, fique a vontade em colaborar enviando um pull request para nós, logo abaixo vamos deixar na documentação como fazer PR.
 
 O que iremos enviar para o [POST] será um json de 1Mb ou 3Mb com mais de 40k de linhas e o corpo do Json está logo abaixo:
 ```bash
@@ -68,6 +66,23 @@ grow.rust
         └── src
             └── main.rs
 ```
+## Docker
+Você poderá utilizar o Docker ou Podman para criar suas imagens, lembrando que quanto menor melhor então tente fazer a menor imagems possível.
+Iremos executar o seguinte comando:
+```bash
+$ docker build --no-cache -f Dockerfile -t growth/<lang>:latest .
+```
+E depois vamos executa-lo:
+```bash
+$ docker run --rm -it -p 8080:8080 growth/<lang>
+```
+
+Fique a vontade em brincar com as possibilidades, pode usar o docker-compose também, pode usar a opção scale se desejar espaço para criatividade sempre é bem vindo 😁.
+
+## Tests de Stress
+
+Iremos fazer um test de stress em seu projeto, então não deixe de levar isto em consideração. Iremos utilizar o V6 e Locust para os testes e eles se encontram na raiz do repositório e com manual de instalação e configuração e com nosso exemplo já prontinho e lindão só executar 😍.
+
 
 ## Endpoints a serem implementados
 Os endpoints que devem ser implementados estão listados logo abaixo, vamos seguir o mesmo padrão para todos os projetos:
