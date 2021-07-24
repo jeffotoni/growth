@@ -1,16 +1,20 @@
 # API Growth 💙 🐿️ 🐍 🦀
 
-Este repositório foi criado para colocarmos projetos em diversas linguagens com intúito totalmente didático 
-para colaborar com a comunidade e desenvolvedores como resolver o problema proposto com objetivo de
-visualizarmos as vantagens e desvantagens de cada uma para resolver o problema.
+Este repositório foi criado para disponibilizarmos projetos em diversas linguagens de programação com intúito didático e colaborar com a comunidade de desenvolvedores. Uma brincadeira que nasceu nas redes sociais e que se materializou neste repositório ❤️.
 
+As linguagens de programação ❤️ são ferramentas e devem ser utilizadas para resolver problemas específicos do que foram propostas a solucionar. Mas sabemos que é muito além disto 😍, nesta equação temos que adicionar uma pitada de AMOR😍 e quando tem esta combinação as coisas começam a ficarem ainda mais interessantes 😂😂.
+
+---
 O escopo do projeto é criar uma API rEST um CRUD e persistir em memória e colocar em uma imagem docker e 
-o tamanho desta imagem não poderá ultrapassar 6Mb.
+o tamanho desta imagem não poderia ultrapassar 6Mb porém sabemos das limitações que cada linguagem possui e neste quesito você poderá enviar uma imagem maior, tente fazer o menor que conseguir bem enxuta ☺️.
+
+O seu POST irá receber um JSON de 1mb ou 3mb e persistir em memória.
+Logo abaixo tem o exemplo e a descrição do que irá precisar implementar na API.
 
 Todo repo foi organizado por linguagens de programação, fique a vontade em colaborar enviando um
 pull request para nós, logo abaixo vamos deixar na documentação como fazer PR.
 
-O que iremos enviar para o [POST] será um json de 3Mb com mais de 40k de linhas e o corpo do Json está logo abaixo:
+O que iremos enviar para o [POST] será um json de 1Mb ou 3Mb com mais de 40k de linhas e o corpo do Json está logo abaixo:
 ```bash
 [
    {
@@ -27,11 +31,9 @@ O que iremos enviar para o [POST] será um json de 3Mb com mais de 40k de linhas
    }
 ]
 ```
-O arquivo 3mb-growth_json.json que encontra-se no raiz deste repositório.
-
 ## Pull Request
 
-Você poderá organizar sua pasta como os exemplos abaixo:
+Você poderá organizar seu diretório como os exemplos abaixo:
 ```bash
 grow.go/
 └── jeffotoni
@@ -67,13 +69,11 @@ grow.rust
             └── main.rs
 ```
 
-Os endpoints que devem ser implementados estão listados logo abaixo, todos vamos seguir
-o mesmo padrão:
-
+## Endpoints a serem implementados
+Os endpoints que devem ser implementados estão listados logo abaixo, vamos seguir o mesmo padrão para todos os projetos:
 
 #### POST
-Criando nossa base de dados na memória, esta requisição é assícrona irá ficar rodando em
-background.
+Criando nossa base de dados na memória, esta requisição é assícrona irá ficar rodando em background mas somente implemente este quesito se sua linguagem fornecer suporte. 
 ```bash
 $ curl -i -XPOST -H "Content-Type:application/json" \
 localhost:8080/api/v1/growth -d @3mb-growth_json.json
