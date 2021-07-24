@@ -6,7 +6,7 @@ As linguagens de programação ❤️ são ferramentas e devem ser utilizadas pa
 
 ---
 O escopo do projeto é criar uma API rEST um CRUD e persistir em memória e colocar em uma imagem docker e 
-o tamanho desta imagem não poderia ultrapassar 6Mb porém sabemos das limitações que cada linguagem possui e neste quesito você poderá enviar uma imagem maior, tente fazer o menor que conseguir bem enxuta ☺️.
+o tamanho desta imagem docker não poderia ultrapassar 6Mb porém sabemos das limitações que cada linguagem possui e neste quesito você poderá enviar uma imagem maior, tente fazer o menor que conseguir bem enxuta ☺️.
 
 O seu POST irá receber um JSON de 1mb ou 3mb e persistir em memória.
 Logo abaixo tem o exemplo e a descrição do que irá precisar implementar na API.
