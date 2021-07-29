@@ -43,6 +43,14 @@ Prontinho, agora vamos executar e testar nossa apigrow ❤️
 ```bash
 $ docker run --rm -it -p 8080:8080 jeffotoni/apigrow
 ```
+
+#### Docker Compose
+Podemos usar o docker-compose e scalar o serviço para brincarmos.
+
+```bash
+$ docker-compose up --scale apigrowth=3 -d 
+```
+
 Agora vamos testar nossa API 🦾
 
 #### POST
