@@ -1,9 +1,10 @@
 package ristretto
 
 import (
-	"github.com/dgraph-io/ristretto"
 	"log"
 	"sync"
+
+	"github.com/dgraph-io/ristretto"
 	//"time"
 )
 
@@ -37,6 +38,7 @@ func Set(key, value string) bool {
 	}
 	cache := Run()
 	cache.Set(key, value, 1)
+	cache.Wait()
 	return true
 }
 
