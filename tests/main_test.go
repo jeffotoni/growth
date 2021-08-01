@@ -36,6 +36,10 @@ func TestDockerfiles(t *testing.T) {
 
 			require.Equal(t, `{"msg":"error in path"}`, string(body))
 			require.Equal(t, http.StatusBadRequest, resp.StatusCode)
+
+			// TODO: Aqui é necessário testar as outras rotas...
+			// O README na raíz do projeto dita as regras, preciso
+			// copiar de lá e trazer pra cá.
 		})
 	}
 }
