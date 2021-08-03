@@ -8,7 +8,6 @@ RUN apk add upx \
 FROM scratch
 
 COPY --from=base /usr/local/bin/php /usr/local/bin/php
-COPY --from=base /lib/ld-musl-x86_64.so.1 /lib/ld-musl-x86_64.so.1
 
 COPY ./php.ini /usr/local/lib/php.ini
 
