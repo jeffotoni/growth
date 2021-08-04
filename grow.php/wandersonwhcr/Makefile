@@ -1,5 +1,4 @@
 PHP_VERSION="8.0.8"
-PECL_APCU_VERSION="5.1.20"
 PECL_SWOOLE_VERSION="4.7.0"
 GIT_SHA_SHORT=$(shell git rev-parse --short HEAD)
 
@@ -11,7 +10,6 @@ base:
 	docker build . \
 		--file Base.Dockerfile \
 		--build-arg PHP_VERSION=${PHP_VERSION} \
-		--build-arg PECL_APCU_VERSION=${PECL_APCU_VERSION} \
 		--build-arg PECL_SWOOLE_VERSION=${PECL_SWOOLE_VERSION} \
 		--tag wandersonwhcr/php:${PHP_VERSION}-cli
 
