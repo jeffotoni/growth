@@ -1,0 +1,9 @@
+config:
+  target: "http://localhost:8080"
+  phases:
+    - duration: 10
+      arrivalRate: 100
+scenarios:
+  - flow:
+      - get:
+          url: "/api/v1/growth/brz/ngdp_r/2002"

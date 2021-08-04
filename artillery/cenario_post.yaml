@@ -1,0 +1,12 @@
+config:
+  target: "http://localhost:8080"
+  processor: "./func-load-json.js"
+  phases:
+    - duration: 10
+      arrivalRate: 100
+scenarios:
+  - flow:
+      - function: "generatePayload"
+      - post:
+          url: "/api/v1/growth"
+          json: "{{payload}}"
