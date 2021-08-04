@@ -1,6 +1,6 @@
 # grow.php/wandersonwhcr
 
-* Tamanho da Imagem: `5.49MB`
+* Tamanho da Imagem: `5.26MB`
 
 ## Imagem
 
