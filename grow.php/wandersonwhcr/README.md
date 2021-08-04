@@ -1,6 +1,7 @@
 # grow.php/wandersonwhcr
 
-* Tamanho da Imagem: `2.38MB`
+* Tamanho da Imagem: `5.26MB`
+* Docker Hub: https://hub.docker.com/r/wandersonwhcr/growth
 
 ## Imagem
 
@@ -34,19 +35,16 @@ docker run --rm \
 
 * Durante a criação da imagem, efetua-se o _download_ do código-fonte do PHP,
   compilando-o com todos os recursos desabilitados.
-* Adiciona-se o módulo externo `apcu` do PHP ao binário de forma estática para
-  reduzir o tamanho; este módulo é responsável por trabalhar com tabelas de
-  _hash_ em memória.
+* Adiciona-se o módulo externo `swoole` do PHP ao binário de forma estática para
+  reduzir o tamanho; este módulo é responsável por trabalhar com _fibers_ e
+  _coroutines_.
 * O executável gerado é compactado através da ferramenta `upx` e sempre que o
   processo é inicializado, o binário é descompactado e depois executado.
-* Utiliza-se uma imagem _scratch_ como base da imagem final; inclui-se um volume
-  `/tmp` para _upload_ de arquivos temporários.
-* O processamento do arquivo é **síncrono**: o PHP não possui execuções
-  assíncronas por causa do _thread safe_ e possivelmente a extensão `pthreads`
-  pode auxiliar neste requisito.
+* Utiliza-se uma imagem _scratch_ como base da imagem final.
+* O processamento do arquivo é **síncrono**: não se desenvolveu uma rotina no
+  Swoole para tal aplicação e isto será desenvolvido nos próximos passos.
 * Pela simplicidade do desafio, não se utilizou _frameworks_ e nem testes
-  unitários. A API é disponibilizada utilizando o Web Server _built-in_ que é
-  recomendado somente para ambientes de desenvolvimento.
+  unitários. A API é disponibilizada utilizando o Web Server do Swoole.
 * Por fim, sinta-se à vontade para melhorar este projeto! O foco inicial foi a
   redução do tamanho da imagem e criação de uma API funcional.
 

@@ -5,11 +5,11 @@ namespace Growth\Action;
 use Swoole\HTTP\Request;
 use Swoole\HTTP\Response;
 
-class NotFound
+class Ping
 {
     public function __invoke(Request $request, Response $response): void
     {
-        $response->status(404);
+        $response->status(204);
         $response->end();
     }
 }
