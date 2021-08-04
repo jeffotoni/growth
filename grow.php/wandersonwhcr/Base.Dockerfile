@@ -25,6 +25,7 @@ RUN ./configure --disable-all \
         --disable-phpdbg --disable-debug \
         --enable-apcu \
         CFLAGS="-O3 -march=native" \
+        CPPFLAGS="-O3 -march=native" \
     && sed -i 's/-export-dynamic/-all-static/g' Makefile
 
 RUN make \
