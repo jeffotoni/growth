@@ -20,7 +20,13 @@ RUN apk add alpine-sdk autoconf automake libtool \
     && apk add bison re2c \
     && ./buildconf --force
 
-RUN ./configure --disable-all --disable-cgi --disable-phpdbg --disable-debug --enable-apcu CFLAGS="-O3 -march=native"
+RUN ./configure --disable-all \
+        --disable-cgi \
+        --disable-phpdbg --disable-debug \
+        --enable-apcu \
+        CFLAGS="-O3 -march=native" \
+        CPPFLAGS="-O3 -march=native" \
+    && sed -i 's/-export-dynamic/-all-static/g' Makefile
 
 RUN make \
     && make install
