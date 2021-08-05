@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/jeffotoni/grow.go/jeffotoni/grow.fiber.ristretto/pkg/ristretto"
+	"github.com/jeffotoni/growth/grow.go/jeffotoni/grow.fiber.ristretto/pkg/ristretto"
 )
 
 var (
