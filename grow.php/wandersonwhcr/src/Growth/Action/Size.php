@@ -2,18 +2,21 @@
 
 namespace Growth\Action;
 
+use Swoole\HTTP\Request;
+use Swoole\HTTP\Response;
+use Swoole\Table;
+
 class Size
 {
-    public function __invoke(): void
+    public function __construct(private Table $table)
     {
-        $count = 0;
-        if (apcu_exists('growth-count')) {
-            $count = apcu_fetch('growth-count');
-        }
+    }
 
-        header('HTTP/1.1 200 OK');
-        header('Content-Type: application/json');
-
-        file_put_contents('php://output', json_encode(['size' => $count]));
+    public function __invoke(Request $request, Response $response): void
+    {
+        $response->header('content-type', 'application/json');
+        $response->end(json_encode([
+            'size' => $this->table->count(),
+        ]));
     }
 }
