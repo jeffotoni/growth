@@ -258,7 +258,7 @@ func Post(w http.ResponseWriter, r *http.Request) {
 	}
 	var numJobs = len(grow)
 	var jobs = make(chan dataGrowth, numJobs)
-	for w := 0; w < 400; w++ {
+	for w := 0; w < 600; w++ {
 		go worker(w, jobs)
 	}
 	for j := 0; j < len(grow); j++ {

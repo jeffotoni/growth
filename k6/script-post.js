@@ -3,7 +3,7 @@ import { SharedArray } from "k6/data";
 import { sleep } from 'k6';
 
 var payload = new SharedArray("growth", function () {
-  var f = JSON.parse(open("./data/growth.json"));
+  var f = JSON.parse(open("../1.1kb-growth_json.json"));
   //console.log(JSON.stringify(f));
   return f;
 });
