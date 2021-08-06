@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -232,19 +231,13 @@ func GetSize(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
-	key, ok := mapGrow.Load("BRZNGDP_R2002")
-	if !ok {
-		WriteService(w, r, 400, `{"msg":"not finished"}`)
-		return
-	}
-
-	var count_str string
-	count, ok := mapGrowCount.Load("count")
-	if ok {
-		count_str = strconv.Itoa(count.(int))
-	}
-	result := fmt.Sprintf("%.2f", key.(float64))
-	WriteService(w, r, 200, `{"msg":"complete","test value"":`+result+`, "count":`+count_str+`}`)
+	length := 0
+	mapGrow.Range(func(_, _ interface{}) bool {
+		length++
+		return true
+	})
+	count_str := strconv.Itoa(length)
+	WriteService(w, r, 200, `{"msg":"complete","count":`+count_str+`}`)
 }
 
 func Post(w http.ResponseWriter, r *http.Request) {
@@ -258,7 +251,7 @@ func Post(w http.ResponseWriter, r *http.Request) {
 	}
 	var numJobs = len(grow)
 	var jobs = make(chan dataGrowth, numJobs)
-	for w := 0; w < 600; w++ {
+	for w := 0; w < 60; w++ {
 		go worker(w, jobs)
 	}
 	for j := 0; j < len(grow); j++ {
@@ -269,19 +262,28 @@ func Post(w http.ResponseWriter, r *http.Request) {
 }
 
 func worker(id int, grow <-chan dataGrowth) {
-	var cnew int = 0
+	//var cnew int = 0
 	for v := range grow {
+		bs := make([]byte, 100)
+		bl := 0
+
 		year := strconv.Itoa(v.Year)
-		key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
-		_, ok := mapGrow.LoadOrStore(key, v.Value)
-		if !ok {
-			cnew++
-		}
+		//key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
+
+		bl += copy(bs[bl:], strings.ToUpper(v.Country))
+		bl += copy(bs[bl:], strings.ToUpper(v.Indicator))
+		bl += copy(bs[bl:], year)
+
+		//mapGrow.LoadOrStore(string(bs), v.Value)
+		mapGrow.Store(string(bs), v.Value)
+		// if !ok {
+		// 	cnew++
+		// }
 	}
-	countInt, _ := mapGrowCount.Load("count")
-	count := countInt.(int)
-	count = count + cnew
-	mapGrowCount.Store("count", count)
+	// countInt, _ := mapGrowCount.Load("count")
+	// count := countInt.(int)
+	// count = count + cnew
+	// mapGrowCount.Store("count", count)
 }
 
 func WriteService(w http.ResponseWriter, r *http.Request, code int, msg string) {

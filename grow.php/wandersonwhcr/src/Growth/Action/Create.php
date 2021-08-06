@@ -44,6 +44,7 @@ class Create
 
         $this->table->set($key, ['content' => json_encode($data)]);
 
+        echo "{$key}\n";
         $response->status(204);
         $response->end();
     }

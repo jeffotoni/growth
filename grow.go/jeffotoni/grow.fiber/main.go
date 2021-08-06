@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"strings"
 	"sync"
@@ -75,9 +74,20 @@ func Post(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).SendString(`{"msg":"error in your json"}`)
 	}
+
+	// for _, v := range grow {
+	// 	year := strconv.Itoa(v.Year)
+	// 	bs := make([]byte, 100)
+	// 	bl := 0
+	// 	bl += copy(bs[bl:], strings.ToUpper(v.Country))
+	// 	bl += copy(bs[bl:], strings.ToUpper(v.Indicator))
+	// 	bl += copy(bs[bl:], year)
+	// 	mapGrow.Store(string(bs), v.Value)
+	// }
+
 	var numJobs = len(grow)
 	var jobs = make(chan dataGrowth, numJobs)
-	for w := 0; w < 500; w++ {
+	for w := 0; w < 15; w++ {
 		go worker(w, jobs)
 	}
 	for _, tgrow := range grow {
@@ -88,46 +98,38 @@ func Post(c *fiber.Ctx) error {
 }
 
 func worker(id int, grow <-chan dataGrowth) {
-	var cnew int = 0
+	//var cnew int = 0
 	for v := range grow {
 		year := strconv.Itoa(v.Year)
-		key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
-		_, ok := mapGrow.LoadOrStore(key, v.Value)
-		if !ok {
-			cnew++
-		}
+		bs := make([]byte, 100)
+		bl := 0
+		bl += copy(bs[bl:], strings.ToUpper(v.Country))
+		bl += copy(bs[bl:], strings.ToUpper(v.Indicator))
+		bl += copy(bs[bl:], year)
+		mapGrow.Store(string(bs), v.Value)
 	}
-	countInt, _ := mapGrowCount.Load("count")
-	count := countInt.(int)
-	count = count + cnew
-	mapGrowCount.Store("count", count)
 }
 
 func GetStatus(c *fiber.Ctx) error {
 	c.Set("Content-Type", "application/json")
-	key, ok := mapGrow.Load("BRZNGDP_R2002")
-	if !ok {
-		return c.Status(400).SendString(`{"msg":"not finished"}`)
-	}
-	var count_str string
-	count, ok := mapGrowCount.Load("count")
-	if ok {
-		count_str = strconv.Itoa(count.(int))
-	}
-	result := fmt.Sprintf("%.2f", key.(float64))
-	return c.Status(200).SendString(`{"msg":"complete","test value"":` + result + `, "count":` + count_str + `}`)
+	length := 0
+	mapGrow.Range(func(_, _ interface{}) bool {
+		length++
+		return true
+	})
+	count_str := strconv.Itoa(length)
+	return c.Status(200).SendString(`{"msg":"complete","count":` + count_str + `}`)
 }
 
 func GetSize(c *fiber.Ctx) error {
 	c.Set("Content-Type", "application/json")
-	var sizeInt int = 0
-	var sizeStr string
-	size, ok := mapGrowCount.Load("count")
-	if ok {
-		sizeInt = size.(int)
-	}
-	sizeStr = strconv.Itoa(sizeInt)
-	return c.Status(200).SendString(`{"size":` + sizeStr + `}`)
+	length := 0
+	mapGrow.Range(func(_, _ interface{}) bool {
+		length++
+		return true
+	})
+	count_str := strconv.Itoa(length)
+	return c.Status(200).SendString(`{"msg":"complete","count":` + count_str + `}`)
 }
 
 func Put(c *fiber.Ctx) (err error) {

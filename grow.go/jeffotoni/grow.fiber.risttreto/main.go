@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/jeffotoni/growth/grow.go/jeffotoni/grow.fiber.ristretto/pkg/ristretto"
+	"github.com/jeffotoni/growth/grow.go/jeffotoni/grow.fiber.risttreto/pkg/ristretto"
 )
 
 var (
@@ -78,7 +78,7 @@ func Post(c *fiber.Ctx) error {
 	}
 	var numJobs = len(grow)
 	var jobs = make(chan dataGrowth, numJobs)
-	for w := 0; w < 500; w++ {
+	for w := 0; w < 50; w++ {
 		go worker(w, jobs)
 	}
 	for _, tgrow := range grow {
@@ -89,39 +89,18 @@ func Post(c *fiber.Ctx) error {
 }
 
 func worker(id int, grow <-chan dataGrowth) {
-	var cnew int = 0
 	for v := range grow {
 		year := strconv.Itoa(v.Year)
-		key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
+		bs := make([]byte, 100)
+		bl := 0
+		bl += copy(bs[bl:], strings.ToUpper(v.Country))
+		bl += copy(bs[bl:], strings.ToUpper(v.Indicator))
+		bl += copy(bs[bl:], year)
+		//key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
 		sval := fmt.Sprintf("%.2f", v.Value)
-		sold := ristretto.Get(key)
-		if len(sold) == 0 {
-			cnew++
-		}
-		ristretto.Set(key, sval)
+		ristretto.Set(string(bs), sval)
 	}
-	countStr := ristretto.Get("count")
-	count, _ := strconv.Atoi(countStr)
-	count = count + cnew
-	countStr = strconv.Itoa(count)
-	ristretto.Set("count", countStr)
 }
-
-// func worker(id int, grow <-chan dataGrowth) {
-// 	var cnew int = 0
-// 	for v := range grow {
-// 		year := strconv.Itoa(v.Year)
-// 		key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
-// 		_, ok := mapGrow.LoadOrStore(key, v.Value)
-// 		if !ok {
-// 			cnew++
-// 		}
-// 	}
-// 	countInt, _ := mapGrowCount.Load("count")
-// 	count := countInt.(int)
-// 	count = count + cnew
-// 	mapGrowCount.Store("count", count)
-// }
 
 func GetStatus(c *fiber.Ctx) error {
 	c.Set("Content-Type", "application/json")
