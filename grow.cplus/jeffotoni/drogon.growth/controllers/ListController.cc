@@ -48,7 +48,7 @@ class JsonStore : public HttpController<JsonStore>
 
     void createItem(const HttpRequestPtr& req,
                   std::function<void(const HttpResponsePtr&)>&& callback)
-    {
+    {   
         if(req->jsonObject())
         {
             auto &root=*(req->jsonObject());
@@ -62,6 +62,7 @@ class JsonStore : public HttpController<JsonStore>
                     dataStore_.insert({key, std::move(itemVal)});
                 }
             }
+           // co_return;
         }
 
         callback(makeSuccessResponse());
