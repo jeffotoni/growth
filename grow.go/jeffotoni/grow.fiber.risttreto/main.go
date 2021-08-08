@@ -46,7 +46,11 @@ func init() {
 }
 
 func main() {
-	app := fiber.New(fiber.Config{BodyLimit: 10 * 1024 * 1024})
+	app := fiber.New(fiber.Config{
+		BodyLimit:    10 * 1024 * 1024,
+		Prefork:      true,
+		ServerHeader: "Fiber",
+	})
 	//app.Use(cors.New())
 	// app.Use(logger.New(logger.Config{
 	// 	Format:     "${pid} ${time} ${method} ${path} - ${ip} - \u001B[0;34m${status}\u001B[0m - \033[1;32m${latency}\033[0m\n",

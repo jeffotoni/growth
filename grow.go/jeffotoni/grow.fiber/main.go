@@ -44,7 +44,11 @@ func init() {
 }
 
 func main() {
-	app := fiber.New(fiber.Config{BodyLimit: 10 * 1024 * 1024})
+	app := fiber.New(fiber.Config{
+		BodyLimit:    10 * 1024 * 1024,
+		Prefork:      true,
+		ServerHeader: "Fiber",
+	})
 	//app.Use(cors.New())
 	// app.Use(logger.New(logger.Config{
 	// 	Format:     "${pid} ${time} ${method} ${path} - ${ip} - \u001B[0;34m${status}\u001B[0m - \033[1;32m${latency}\033[0m\n",
@@ -90,24 +94,32 @@ func Post(c *fiber.Ctx) error {
 	for w := 0; w < 15; w++ {
 		go worker(w, jobs)
 	}
+	var i int = 0
 	for _, tgrow := range grow {
 		jobs <- tgrow
+		i++
 	}
+	println("total:", i)
 	close(jobs)
 	return c.Status(202).SendString(`{"msg":"In progress"}`)
 }
 
 func worker(id int, grow <-chan dataGrowth) {
-	//var cnew int = 0
 	for v := range grow {
+		var strBuilder strings.Builder
 		year := strconv.Itoa(v.Year)
-		bs := make([]byte, 100)
-		bl := 0
-		bl += copy(bs[bl:], strings.ToUpper(v.Country))
-		bl += copy(bs[bl:], strings.ToUpper(v.Indicator))
-		bl += copy(bs[bl:], year)
-		mapGrow.Store(string(bs), v.Value)
+		strBuilder.WriteString(strings.ToUpper(v.Country))
+		strBuilder.WriteString(strings.ToUpper(v.Indicator))
+		strBuilder.WriteString(strings.ToUpper(year))
+
+		// bs := make([]byte, 100)
+		// bl := 0
+		// bl += copy(bs[bl:], strings.ToUpper(v.Country))
+		// bl += copy(bs[bl:], strings.ToUpper(v.Indicator))
+		// bl += copy(bs[bl:], year)
+		mapGrow.Store(strBuilder.String(), v.Value)
 	}
+
 }
 
 func GetStatus(c *fiber.Ctx) error {

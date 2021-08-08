@@ -8,6 +8,8 @@ RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o apigrow
 
 FROM alpine:latest as builder2
 RUN apk add --no-cache upx
+
+
 COPY --from=builder /go/src/main /go/src/main
 WORKDIR /go/src/main
 RUN upx apigrow
