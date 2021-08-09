@@ -137,9 +137,11 @@ func GetStatus(c *fiber.Ctx) error {
 
 func GetSize(c *fiber.Ctx) error {
 	c.Set("Content-Type", "application/json")
+
 	length := 0
-	mapGrow.Range(func(_, _ interface{}) bool {
+	mapGrow.Range(func(key interface{}, value interface{}) bool {
 		length++
+		println("here")
 		return true
 	})
 	count_str := strconv.Itoa(length)
