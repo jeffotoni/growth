@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -46,6 +47,8 @@ func init() {
 }
 
 func main() {
+	//runtime.NumCPU()
+	runtime.GOMAXPROCS(1)
 	app := fiber.New(fiber.Config{
 		BodyLimit:    10 * 1024 * 1024,
 		Prefork:      true,

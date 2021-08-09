@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -44,6 +45,7 @@ func init() {
 }
 
 func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	app := fiber.New(fiber.Config{
 		BodyLimit:    10 * 1024 * 1024,
 		Prefork:      true,
@@ -99,7 +101,7 @@ func Post(c *fiber.Ctx) error {
 		jobs <- tgrow
 		i++
 	}
-	println("total:", i)
+	//println("total:", i)
 	close(jobs)
 	return c.Status(202).SendString(`{"msg":"In progress"}`)
 }

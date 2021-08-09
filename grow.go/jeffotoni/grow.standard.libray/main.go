@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -78,6 +79,8 @@ func Middleware(h http.Handler, adapters ...Adapter) http.Handler {
 }
 
 func main() {
+	//runtime.NumCPU()
+	runtime.GOMAXPROCS(1)
 	mux := http.NewServeMux()
 	mux.Handle("/ping",
 		Middleware(http.HandlerFunc(
