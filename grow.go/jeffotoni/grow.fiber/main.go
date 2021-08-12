@@ -93,15 +93,12 @@ func Post(c *fiber.Ctx) error {
 
 	var numJobs = len(grow)
 	var jobs = make(chan dataGrowth, numJobs)
-	for w := 0; w < 15; w++ {
+	for w := 0; w < 11; w++ {
 		go worker(w, jobs)
 	}
-	var i int = 0
 	for _, tgrow := range grow {
 		jobs <- tgrow
-		i++
 	}
-	//println("total:", i)
 	close(jobs)
 	return c.Status(202).SendString(`{"msg":"In progress"}`)
 }

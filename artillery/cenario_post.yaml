@@ -2,7 +2,7 @@ config:
   target: "http://localhost:8080"
   processor: "./func-load-json.js"
   phases:
-    - duration: 10
+    - duration: 30
       arrivalRate: 100
 scenarios:
   - flow:
