@@ -212,6 +212,7 @@ func Get(w http.ResponseWriter, r *http.Request) {
 		grow.Country = country
 		grow.Indicator = Indicator
 		grow.Year, _ = strconv.Atoi(year)
+		//grow.Year = year
 		b, err = json.Marshal(&grow)
 		if err != nil {
 			WriteService(w, r, code, `{"msg":"error marshal:`+err.Error()+`"}`)
@@ -245,6 +246,26 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 
 func Post(w http.ResponseWriter, r *http.Request) {
 	var grow []dataGrowth
+	// b, err := io.ReadAll(r.Body)
+	// if err != nil {
+	// 	w.Header().Set("Content-Type", "application/json")
+	// 	w.WriteHeader(http.StatusBadRequest)
+	// 	w.Write([]byte(`{"msg":"error in Payload"}`))
+	// 	return
+	// }
+
+	//var fv = make(chan []*fastjson.Value)
+	// go func(b []byte) {
+	// 	var p fastjson.Parser
+	// 	v, _ := p.ParseBytes(b)
+	// 	vv, _ := v.Array()
+	// 	fv <- vv
+	// }(b)
+
+	// var p fastjson.Parser
+	// v, _ := p.ParseBytes(b)
+	// vv, _ := v.Array()
+
 	err := json.NewDecoder(r.Body).Decode(&grow)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -252,15 +273,59 @@ func Post(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"msg":"error in your json"}`))
 		return
 	}
-	var numJobs = len(grow)
-	var jobs = make(chan dataGrowth, numJobs)
-	for w := 0; w < 60; w++ {
+
+	var jobs = make(chan dataGrowth, len(grow))
+	for w := 0; w < 9; w++ {
 		go worker(w, jobs)
 	}
+
 	for j := 0; j < len(grow); j++ {
+		//for i, vs := range grow {
 		jobs <- grow[j]
 	}
+
+	//for j := 0; j < len(vv); j++ {
+	// for _, vs := range vv {
+	// 	growx.Country = vs.Get("Country").String()
+	// 	growx.Indicator = vs.Get("Indicator").String()
+	// 	growx.Value = vs.GetFloat64("Value")
+	// 	growx.Year = vs.GetInt("Year")
+	// 	jobs <- growx
+	// }
 	close(jobs)
+
+	// var p fastjson.Parser
+	// v, err := p.ParseBytes(b)
+	// if err != nil {
+	// 	w.Header().Set("Content-Type", "application/json")
+	// 	w.WriteHeader(http.StatusBadRequest)
+	// 	w.Write([]byte(`{"msg":"error in ParserBytes"}`))
+	// 	return
+	// }
+	// fmt.Sprintf("%v", v)
+
+	// _, err = v.Array()
+	// if err != nil {
+	// 	w.Header().Set("Content-Type", "application/json")
+	// 	w.WriteHeader(http.StatusBadRequest)
+	// 	w.Write([]byte(`{"msg":"error in ParserBytes"}`))
+	// 	return
+	// }
+
+	//var numJobs = len(vv)
+	// var jobs = make(chan dataGrowth, len(vv))
+	// for w := 0; w < 12; w++ {
+	// 	go worker(w, jobs)
+	// }
+	//for j := 0; j < len(vv); j++ {
+	// for _, vs := range vv {
+	// 	growx.Country = vs.Get("Country").String()
+	// 	growx.Indicator = vs.Get("Indicator").String()
+	// 	growx.Value = vs.GetFloat64("Value")
+	// 	growx.Year = vs.GetInt("Year")
+	// 	jobs <- growx
+	// }
+	// close(jobs)
 	WriteService(w, r, 202, `{"msg":"In progress"}`)
 }
 
@@ -269,10 +334,8 @@ func worker(id int, grow <-chan dataGrowth) {
 	for v := range grow {
 		bs := make([]byte, 100)
 		bl := 0
-
 		year := strconv.Itoa(v.Year)
 		//key := strings.ToUpper(v.Country) + strings.ToUpper(v.Indicator) + year
-
 		bl += copy(bs[bl:], strings.ToUpper(v.Country))
 		bl += copy(bs[bl:], strings.ToUpper(v.Indicator))
 		bl += copy(bs[bl:], year)
