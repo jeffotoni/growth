@@ -2,10 +2,16 @@ package main
 
 import (
 	"encoding/json"
-	"io"
 	"log"
 	"net/http"
+	// sy "github.com/jeffotoni/api1/syncmap"
+	// "github.com/patrickmn/go-cache"
 )
+
+// var c = cache.New(5*time.Minute, 10*time.Minute)
+// var m = sy.NewSyncMap()
+
+// type Growth sy.Growth
 
 type Growth struct {
 	Country   string  `json:"country,omitempty"`
@@ -23,20 +29,40 @@ func main() {
 
 func Add(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+
 	var growth Growth
-	b, err := io.ReadAll(r.Body)
+	err := json.NewDecoder(r.Body).Decode(&growth)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"msg":"error body parse}`))
+		w.Write([]byte(`{"msg":"error NewDecoder}`))
 		return
 	}
 
-	err = json.Unmarshal(b, &growth)
+	b, err := json.Marshal(growth)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"msg":"error unmarshal}`))
+		w.Write([]byte(`{"msg":"error Marshal"}`))
 		return
 	}
+
+	// b, err := io.ReadAll(r.Body)
+	// if err != nil {
+	// 	w.WriteHeader(http.StatusInternalServerError)
+	// 	w.Write([]byte(`{"msg":"error body parse}`))
+	// 	return
+	// }
+
+	// var growth sy.Growth
+	// err = json.Unmarshal(b, &growth)
+	// if err != nil {
+	// 	w.WriteHeader(http.StatusInternalServerError)
+	// 	w.Write([]byte(`{"msg":"error unmarshal}`))
+	// 	return
+	// }
+
+	// key := strconv.Itoa(rand.New(rand.NewSource(int64(new(maphash.Hash).Sum64()))).Int())
+	// c.Set(key, growth, cache.NoExpiration)
+	// m.Store(key, growth)
 
 	w.WriteHeader(http.StatusCreated)
 	w.Header().Add("Engine", "Go")
