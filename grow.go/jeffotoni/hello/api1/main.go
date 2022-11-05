@@ -2,18 +2,23 @@ package main
 
 import (
 	"encoding/json"
+	"hash/maphash"
 	"log"
+	"math/rand"
 	"net/http"
+	"strconv"
+	"time"
+
 	// sy "github.com/jeffotoni/api1/syncmap"
-	// "github.com/patrickmn/go-cache"
+	"github.com/patrickmn/go-cache"
 )
 
-// var c = cache.New(5*time.Minute, 10*time.Minute)
+var c = cache.New(25*time.Minute, 10*time.Minute)
+
 // var m = sy.NewSyncMap()
 
-// type Growth sy.Growth
-
 type Growth struct {
+	Id        string  `json:"id,omitempty"`
 	Country   string  `json:"country,omitempty"`
 	Indicator string  `json:"indicator,omitempty"`
 	Value     float32 `json:"value,omitempty"`
@@ -38,12 +43,12 @@ func Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	b, err := json.Marshal(growth)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"msg":"error Marshal"}`))
-		return
-	}
+	// b, err := json.Marshal(growth)
+	// if err != nil {
+	// 	w.WriteHeader(http.StatusInternalServerError)
+	// 	w.Write([]byte(`{"msg":"error Marshal"}`))
+	// 	return
+	// }
 
 	// b, err := io.ReadAll(r.Body)
 	// if err != nil {
@@ -60,15 +65,17 @@ func Add(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	// key := strconv.Itoa(rand.New(rand.NewSource(int64(new(maphash.Hash).Sum64()))).Int())
-	// c.Set(key, growth, cache.NoExpiration)
+	key := strconv.Itoa(rand.New(rand.NewSource(int64(new(maphash.Hash).Sum64()))).Int())
+	growth.Id = key
+	c.Set(key, growth, cache.NoExpiration)
 	// m.Store(key, growth)
 
+	w.Header().Set("Engine", "Go")
+	w.Header().Set("key", key)
+	w.Header().Set("Country", growth.Country)
+	w.Header().Set("Indicator", growth.Indicator)
 	w.WriteHeader(http.StatusCreated)
-	w.Header().Add("Engine", "Go")
-	w.Header().Add("Country", growth.Country)
-	w.Header().Add("Indicator", growth.Indicator)
-	w.Write(b)
+	w.Write([]byte(""))
 	return
 }
 
