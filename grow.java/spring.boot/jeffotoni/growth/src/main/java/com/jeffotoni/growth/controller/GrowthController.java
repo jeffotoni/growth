@@ -30,16 +30,25 @@ public class GrowthController {
 	@GetMapping
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
+
+	// consumes = MediaType.APPLICATION_JSON_VALUE)
 	public List<Censo> lista() {
+
 		Censo censo = new Censo("00001", "BRZ", "NGDP_R", 183.26, 2002);
 		return Arrays.asList(censo, censo, censo);
+		// return CensoDto.convert(Arrays.asList(censo, censo, censo));
 	}
 
 	@ResponseStatus(HttpStatus.OK)
 	@GetMapping(path = "/{key}")
 	public List<Censo> getCenso(@PathVariable String key) {
+
 		Censo censo = mapCenso.get(key);
+		// System.out.println("here censo:"+censo.getContry());
 		System.out.println("here censo:" + key);
+		// System.out.println("here cabeca de pudim:" + censo.getContry());
+		// return "ola nada ainda";
+
 		if (censo == null) {
 			Censo censo2 = new Censo("0", "", "", 0.0, 0);
 			return Arrays.asList(censo2);
@@ -56,6 +65,11 @@ public class GrowthController {
 		key = String.valueOf(randomNum);
 		censo.setId(key);
 		mapCenso.put(key, censo);
+
+		// Censo sandrao = mapCenso.get(key);
+		// System.out.println("censo:"+sandrao.getContry());
+		// System.out.println("key:"+key);
+
 		return ResponseEntity.created(URI.create(String.format("/v1/growth"))).header("Engine", "Spring Boot")
 				.header("Country", censo.getContry()).header("Indicator", censo.getIndicator()).header("key", key)
 				.body(censo);
