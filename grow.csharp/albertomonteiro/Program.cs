@@ -23,7 +23,6 @@ app.MapGet("/ping", () =>
     return new { msg = "pong" };
 });
 
-
 app.MapGet("/api/v1/growth/size", () => GrowDatabase.Data.Count);
 
 app.MapGet("/api/v1/growth/post/status", () =>
